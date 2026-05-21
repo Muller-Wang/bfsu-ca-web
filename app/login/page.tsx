@@ -34,57 +34,57 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex">
       {/* Left side — editorial banner */}
-      <aside className="hidden md:flex md:w-2/5 bg-card border-r rule px-12 py-16 flex-col justify-between relative overflow-hidden">
+      <aside className="hidden md:flex md:w-1/2 bg-card border-r rule px-16 py-20 flex-col justify-between relative overflow-hidden">
         <div>
-          <div className="meta">BEIJING FOREIGN STUDIES UNIVERSITY</div>
-          <h1 className="display text-5xl mt-6 leading-[1.05]">
+          <div className="meta text-xs">BEIJING FOREIGN STUDIES UNIVERSITY</div>
+          <h1 className="display mt-10 leading-[0.95] text-[clamp(5rem,9vw,9rem)]">
             创协
             <br />
             <span className="text-accent italic font-serif">Creative</span>
             <br />
             Association
           </h1>
-          <p className="mt-8 text-sm text-ink-soft max-w-xs leading-relaxed">
+          <p className="mt-12 text-base text-ink-soft max-w-md leading-relaxed">
             一个让秘书处、各部部长和成员都在同一张桌上工作的地方。
             策划、申报、归档、学时——一以贯之。
           </p>
         </div>
 
         <div className="flex items-end justify-between">
-          <div className="meta">EST. 2024 · INTERNAL</div>
-          <div className="display text-7xl text-rule select-none">№ 01</div>
+          <div className="meta text-xs">EST. 2014 · INTERNAL</div>
+          <div className="display text-8xl text-rule select-none">№ 01</div>
         </div>
 
         {/* Decorative rule */}
-        <div className="absolute top-1/2 left-12 right-12 border-t border-rule pointer-events-none" />
+        <div className="absolute top-1/2 left-16 right-16 border-t border-rule pointer-events-none" />
       </aside>
 
       {/* Right side — login form */}
-      <main className="flex-1 flex items-center justify-center px-6 py-10">
-        <div className="w-full max-w-sm">
-          <div className="meta mb-2">SIGN IN · 登录</div>
-          <h2 className="display text-3xl mb-1">欢迎回来</h2>
-          <p className="text-sm text-ink-soft mb-8">使用学号和密码登录系统</p>
+      <main className="flex-1 flex items-center justify-center px-10 py-12">
+        <div className="w-full max-w-md">
+          <div className="meta text-xs mb-4">SIGN IN · 登录</div>
+          <h2 className="display text-6xl mb-3 leading-[1.05]">欢迎回来</h2>
+          <p className="text-base text-ink-soft mb-12">使用学号和密码登录系统</p>
 
-          <form onSubmit={handleLogin} className="space-y-5">
+          <form onSubmit={handleLogin} className="space-y-7">
             <div>
-              <label className="meta block mb-2">学号 / STUDENT ID</label>
+              <label className="meta text-xs block mb-3">学号 / STUDENT ID</label>
               <input
                 value={studentId}
                 onChange={(e) => setStudentId(e.target.value)}
-                className="w-full bg-transparent border-b rule pb-2 outline-none focus:border-ink font-mono text-base transition-colors"
+                className="w-full bg-transparent border-b rule pb-3 outline-none focus:border-ink font-mono text-lg transition-colors"
                 placeholder="23110301001"
                 autoComplete="username"
               />
             </div>
 
             <div>
-              <label className="meta block mb-2">密码 / PASSWORD</label>
+              <label className="meta text-xs block mb-3">密码 / PASSWORD</label>
               <input
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 type="password"
-                className="w-full bg-transparent border-b rule pb-2 outline-none focus:border-ink font-mono text-base transition-colors"
+                className="w-full bg-transparent border-b rule pb-3 outline-none focus:border-ink font-mono text-lg transition-colors"
                 placeholder="••••••••"
                 autoComplete="current-password"
               />
@@ -94,20 +94,20 @@ export default function LoginPage() {
 
             <button
               type="submit"
-              className="w-full mt-2 py-3 bg-ink text-card hover:bg-accent transition-colors text-sm tracking-wider"
+              className="w-full mt-4 py-4 bg-ink text-card hover:bg-accent transition-colors text-base tracking-[0.3em]"
             >
               登 录
             </button>
           </form>
 
-          <div className="mt-10 pt-6 border-t rule">
-            <div className="meta mb-3">DEMO · 快速切换角色查看</div>
-            <div className="grid grid-cols-1 gap-1.5">
+          <div className="mt-12 pt-7 border-t rule">
+            <div className="meta text-xs mb-4">DEMO · 快速切换角色查看</div>
+            <div className="grid grid-cols-1 gap-2">
               {USERS.slice(0, 5).map((u) => (
                 <button
                   key={u.id}
                   onClick={() => quickLogin(u.id)}
-                  className="text-left px-3 py-2 border rule hover:bg-card hover:border-accent transition-colors flex items-center justify-between text-sm"
+                  className="text-left px-4 py-2.5 border rule hover:bg-card hover:border-accent transition-colors flex items-center justify-between text-sm"
                 >
                   <span>
                     {u.name}
