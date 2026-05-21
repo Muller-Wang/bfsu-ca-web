@@ -1,24 +1,38 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import clsx from "clsx";
 import { USERS } from "@/lib/mock/users";
-import { ROLE_LABEL, type Role } from "@/lib/types";
+import { ROLE_LABEL, type Role, type User } from "@/lib/types";
+import { canRemoveMember, getStoredUser } from "@/lib/auth";
 
 export default function AdminMembersPage() {
   const [status, setStatus] = useState<Role | "all">("all");
   const [dept, setDept] = useState<string>("all");
+  const [members, setMembers] = useState<User[]>(USERS);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [confirmTarget, setConfirmTarget] = useState<User | null>(null);
 
-  const filtered = USERS.filter((u) => status === "all" || u.role === status)
+  useEffect(() => {
+    setCurrentUser(getStoredUser());
+  }, []);
+
+  const filtered = members.filter((u) => status === "all" || u.role === status)
     .filter((u) => dept === "all" || u.department === dept);
 
-  const depts = Array.from(new Set(USERS.map((u) => u.department)));
+  const depts = Array.from(new Set(members.map((u) => u.department)));
+  const allowRemove = canRemoveMember(currentUser);
+
+  const handleRemove = (target: User) => {
+    setMembers((prev) => prev.filter((u) => u.id !== target.id));
+    setConfirmTarget(null);
+  };
 
   return (
     <div>
       <div className="flex items-baseline justify-between mb-5">
         <h2 className="display text-2xl">
-          成员名单 <span className="meta ml-2">{USERS.length} 人</span>
+          成员名单 <span className="meta ml-2">{members.length} 人</span>
         </h2>
         <button className="px-4 py-2 text-sm bg-accent text-card hover:bg-accent-soft transition-colors">
           + 添加成员
@@ -79,17 +93,80 @@ export default function AdminMembersPage() {
               {u.role === "probation" && (
                 <button className="border-b rule text-accent hover:border-accent">转正</button>
               )}
-              <button className="border-b rule text-danger hover:border-danger">移除</button>
+              {allowRemove ? (
+                <button
+                  onClick={() => setConfirmTarget(u)}
+                  className="border-b rule text-danger hover:border-danger"
+                >
+                  除名
+                </button>
+              ) : (
+                <span
+                  className="border-b border-transparent text-ink-soft/40 cursor-not-allowed"
+                  title="仅社长可执行除名操作"
+                >
+                  除名
+                </span>
+              )}
             </span>
           </div>
         ))}
       </div>
 
+      {/* Permission hint */}
+      {!allowRemove && (
+        <div className="mt-6 px-4 py-3 border-l-2 border-rule bg-card/50 text-sm text-ink-soft">
+          <span className="meta mr-2">ⓘ 权限说明</span>
+          「除名」仅社长可执行。秘书处可执行其他成员管理操作。
+        </div>
+      )}
+
       {/* Probation hint */}
       {filtered.some((u) => u.probationLeftDays) && (
-        <div className="mt-6 px-4 py-3 border-l-2 border-warn bg-card/50 text-sm">
+        <div className="mt-3 px-4 py-3 border-l-2 border-warn bg-card/50 text-sm">
           <span className="meta text-warn mr-2">⓵ 提醒</span>
           预备期成员将在 60 天后自动提示秘书处审批转正
+        </div>
+      )}
+
+      {/* Confirm dialog */}
+      {confirmTarget && (
+        <div
+          className="fixed inset-0 bg-ink/40 backdrop-blur-sm grid place-items-center z-50 px-6"
+          onClick={() => setConfirmTarget(null)}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="bg-card border rule rounded-sm max-w-md w-full shadow-2xl"
+          >
+            <div className="px-7 py-6 border-b rule">
+              <div className="meta text-danger mb-2">⚠ DANGER · 不可撤销</div>
+              <h3 className="display text-2xl">确认除名 {confirmTarget.name}？</h3>
+            </div>
+            <div className="px-7 py-5 text-sm text-ink-soft leading-relaxed">
+              <p>
+                被除名后，<span className="text-ink font-medium">{confirmTarget.name}</span>（{confirmTarget.workNo}）
+                将立即失去系统访问权限。该操作不可恢复。
+              </p>
+              <p className="mt-3">
+                ta 名下的 <span className="text-ink">在进行中任务</span> 将转给所在部门部长，<span className="text-ink">活动归档</span> 保留不变。
+              </p>
+            </div>
+            <div className="px-7 py-4 border-t rule flex justify-end gap-3">
+              <button
+                onClick={() => setConfirmTarget(null)}
+                className="text-sm px-4 py-2 hover:text-ink"
+              >
+                取消
+              </button>
+              <button
+                onClick={() => handleRemove(confirmTarget)}
+                className="text-sm px-4 py-2 bg-danger text-card hover:bg-accent transition-colors"
+              >
+                确认除名
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

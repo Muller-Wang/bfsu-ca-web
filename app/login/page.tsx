@@ -37,16 +37,16 @@ export default function LoginPage() {
       <aside className="hidden md:flex md:w-1/2 bg-card border-r rule px-16 py-20 flex-col justify-between relative overflow-hidden">
         <div>
           <div className="meta text-xs">BEIJING FOREIGN STUDIES UNIVERSITY</div>
-          <h1 className="display mt-10 leading-[0.95] text-[clamp(4rem,7.2vw,7.2rem)]">
-            创协
+          <h1 className="display mt-10 leading-[0.95] text-[clamp(4rem,6.0vw,6.0rem)]">
+            北外创协
             <br />
             <span className="text-accent italic font-serif">Creative</span>
             <br />
             Association
           </h1>
           <p className="mt-12 text-base text-ink-soft max-w-md leading-relaxed">
-            一个让秘书处、各部部长和成员都在同一张桌上工作的地方。
-            策划、申报、归档、学时——一以贯之。
+            北外创协的内网和管理系统
+            用于策划、申报、归档、日程安排
           </p>
         </div>
 

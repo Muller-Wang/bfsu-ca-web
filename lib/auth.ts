@@ -39,3 +39,14 @@ export function canSeeAdmin(user: User | null) {
   if (!user) return false;
   return user.role === "president" || user.role === "secretary";
 }
+
+/** 除名成员：仅社长（president）可执行 */
+export function canRemoveMember(user: User | null) {
+  if (!user) return false;
+  return user.role === "president";
+}
+
+/** 删除活动：秘书处与社长均可 */
+export function canDeleteEvent(user: User | null) {
+  return canSeeAdmin(user);
+}
