@@ -1,7 +1,8 @@
-export type Role = "president" | "secretary" | "head" | "member" | "probation";
+export type Role = "president" | "vice_president" | "secretary" | "head" | "member" | "probation";
 
 export const ROLE_LABEL: Record<Role, string> = {
   president: "社长",
+  vice_president: "副社长",
   secretary: "秘书处",
   head: "部长",
   member: "正式成员",

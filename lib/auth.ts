@@ -37,16 +37,16 @@ export function getStoredUser(): User | null {
 
 export function canSeeAdmin(user: User | null) {
   if (!user) return false;
-  return user.role === "president" || user.role === "secretary";
+  return user.role === "president" || user.role === "vice_president" || user.role === "secretary";
 }
 
-/** 除名成员：仅社长（president）可执行 */
+/** 除名成员：仅社长（president）可执行。副社长与秘书处不可。 */
 export function canRemoveMember(user: User | null) {
   if (!user) return false;
   return user.role === "president";
 }
 
-/** 删除活动：秘书处与社长均可 */
+/** 删除活动：社长 / 副社长 / 秘书处均可 */
 export function canDeleteEvent(user: User | null) {
   return canSeeAdmin(user);
 }

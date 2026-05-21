@@ -47,6 +47,7 @@ export default function AdminMembersPage() {
         >
           <option value="all">状态 · 全部</option>
           <option value="president">社长</option>
+          <option value="vice_president">副社长</option>
           <option value="secretary">秘书处</option>
           <option value="head">部长</option>
           <option value="member">正式成员</option>
@@ -83,7 +84,15 @@ export default function AdminMembersPage() {
             </span>
             <span className="text-ink-soft">{u.department}</span>
             <span className="text-ink-soft">{u.title}</span>
-            <span className={clsx(u.role === "probation" ? "text-warn" : "text-success")}>
+            <span
+              className={clsx(
+                u.role === "probation"
+                  ? "text-warn"
+                  : u.role === "president" || u.role === "vice_president"
+                  ? "text-accent"
+                  : "text-success"
+              )}
+            >
               {ROLE_LABEL[u.role]}
             </span>
             <span className="font-mono text-xs text-ink-soft">{u.joinDate.slice(2, 7).replace("-", "/")}</span>
@@ -117,7 +126,7 @@ export default function AdminMembersPage() {
       {!allowRemove && (
         <div className="mt-6 px-4 py-3 border-l-2 border-rule bg-card/50 text-sm text-ink-soft">
           <span className="meta mr-2">ⓘ 权限说明</span>
-          「除名」仅社长可执行。秘书处可执行其他成员管理操作。
+          「除名」仅社长可执行。副社长 / 秘书处可执行其他成员管理操作。
         </div>
       )}
 
