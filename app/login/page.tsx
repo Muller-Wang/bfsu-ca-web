@@ -37,7 +37,7 @@ export default function LoginPage() {
       <aside className="hidden md:flex md:w-1/2 bg-card border-r rule px-16 py-20 flex-col justify-between relative overflow-hidden">
         <div>
           <div className="meta text-xs">BEIJING FOREIGN STUDIES UNIVERSITY</div>
-          <h1 className="display mt-10 leading-[0.95] text-[clamp(5rem,9vw,9rem)]">
+          <h1 className="display mt-10 leading-[0.95] text-[clamp(4rem,7.2vw,7.2rem)]">
             创协
             <br />
             <span className="text-accent italic font-serif">Creative</span>
