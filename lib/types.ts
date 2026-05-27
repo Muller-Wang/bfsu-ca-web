@@ -82,6 +82,13 @@ export interface Announcement {
   pinned: boolean;
 }
 
+export type TemplateCategory = "general" | "letter";
+
+export const TEMPLATE_CATEGORY_LABEL: Record<TemplateCategory, string> = {
+  general: "通用模版",
+  letter: "书信模版",
+};
+
 export interface Template {
   id: string;
   name: string;
@@ -90,6 +97,47 @@ export interface Template {
   version: string;
   updatedAt: string;
   size?: string;
+  category: TemplateCategory;
+}
+
+export type LiaisonCategory = "club" | "enterprise" | "foundation" | "government";
+
+export const LIAISON_CATEGORY_LABEL: Record<LiaisonCategory, string> = {
+  club: "社团外联",
+  enterprise: "企业合作",
+  foundation: "基金会/组织",
+  government: "政府单位",
+};
+
+export type LiaisonStatus = "contacting" | "negotiating" | "cooperating" | "completed" | "stalled";
+
+export const LIAISON_STATUS_LABEL: Record<LiaisonStatus, string> = {
+  contacting: "接洽中",
+  negotiating: "洽谈中",
+  cooperating: "合作中",
+  completed: "已完成",
+  stalled: "搁置",
+};
+
+export const LIAISON_STATUS_COLOR: Record<LiaisonStatus, string> = {
+  contacting: "#b8731f",
+  negotiating: "#7a1f2e",
+  cooperating: "#4a6b3a",
+  completed: "#5c5651",
+  stalled: "#8c2a1f",
+};
+
+export interface LiaisonEntry {
+  id: string;
+  name: string;
+  category: LiaisonCategory;
+  status: LiaisonStatus;
+  contact: string;
+  contactRole?: string;
+  notes: string;
+  updatedAt: string;
+  nextStep?: string;
+  since?: string;
 }
 
 export interface ArchiveItem {

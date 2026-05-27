@@ -8,6 +8,7 @@ const ADMIN_NAV = [
   { href: "/admin", label: "成员管理", en: "MEMBERS" },
   { href: "/admin/events", label: "活动管理", en: "EVENTS" },
   { href: "/admin/credits", label: "学时管理", en: "CREDITS" },
+  { href: "/admin/templates", label: "模板管理", en: "TEMPLATES" },
   { href: "/admin/permissions", label: "权限设置", en: "PERMISSIONS" },
   { href: "/admin/announcements", label: "系统公告", en: "ANNOUNCEMENTS" },
 ];

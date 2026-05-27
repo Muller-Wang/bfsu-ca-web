@@ -11,6 +11,7 @@ const ITEMS = [
   { href: "/", label: "Dashboard", zh: "主页" },
   { href: "/calendar", label: "Calendar", zh: "日历" },
   { href: "/tasks", label: "Tasks", zh: "任务" },
+  { href: "/workspace", label: "Workspace", zh: "外联工作区" },
   { href: "/library", label: "Library", zh: "资料库" },
   { href: "/profile", label: "Profile", zh: "个人中心" },
 ] as const;

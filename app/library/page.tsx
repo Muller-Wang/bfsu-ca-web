@@ -3,7 +3,7 @@
 import { useState } from "react";
 import clsx from "clsx";
 import { ARCHIVE, TEMPLATES } from "@/lib/mock/data";
-import { EVENT_TAG_META, type ArchiveItem } from "@/lib/types";
+import { EVENT_TAG_META, TEMPLATE_CATEGORY_LABEL, type ArchiveItem, type TemplateCategory } from "@/lib/types";
 
 type Tab = "templates" | "archive";
 
@@ -63,12 +63,33 @@ export default function LibraryPage() {
 }
 
 function TemplateGrid({ query }: { query: string }) {
-  const list = TEMPLATES.filter((t) =>
-    t.name.toLowerCase().includes(query.toLowerCase()) || t.nameEn.toLowerCase().includes(query.toLowerCase())
-  );
+  const [cat, setCat] = useState<TemplateCategory | "all">("all");
+
+  const list = TEMPLATES.filter((t) => {
+    const matchQuery = t.name.toLowerCase().includes(query.toLowerCase()) || t.nameEn.toLowerCase().includes(query.toLowerCase());
+    const matchCat = cat === "all" || t.category === cat;
+    return matchQuery && matchCat;
+  });
+
   return (
     <section className="rise rise-3">
-      <div className="meta mb-5">TEMPLATES · {list.length}</div>
+      <div className="flex items-center justify-between mb-5">
+        <div className="meta">TEMPLATES · {list.length}</div>
+        <div className="flex items-center gap-1 text-xs">
+          {(["all", "general", "letter"] as const).map((c) => (
+            <button
+              key={c}
+              onClick={() => setCat(c)}
+              className={clsx(
+                "px-3 py-1.5 border rule transition-colors",
+                cat === c ? "bg-ink text-card border-ink" : "hover:border-ink"
+              )}
+            >
+              {c === "all" ? "全部" : TEMPLATE_CATEGORY_LABEL[c]}
+            </button>
+          ))}
+        </div>
+      </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {list.map((tp) => (
           <article
@@ -79,7 +100,12 @@ function TemplateGrid({ query }: { query: string }) {
               <div className="w-12 h-12 border rule flex items-center justify-center font-mono text-xs font-medium">
                 {EXT_BADGE[tp.ext]}
               </div>
-              <span className="meta">{tp.version}</span>
+              <div className="flex items-center gap-2">
+                {tp.category === "letter" && (
+                  <span className="text-[10px] border rule px-1.5 py-0.5 text-ink-soft">书信</span>
+                )}
+                <span className="meta">{tp.version}</span>
+              </div>
             </div>
             <h3 className="text-base mb-0.5">{tp.name}</h3>
             <div className="meta italic font-serif text-sm normal-case tracking-normal">{tp.nameEn}</div>

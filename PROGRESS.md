@@ -4,13 +4,13 @@
 
 ## 当前状态
 
-**v0.1 高保真静态原型完成**（2026-05-21）
-- 6 个主页面 + 1 登录页 + 5 个 admin 子页全部跑通
-- 9 名 mock 用户、覆盖 5 种角色
+**v0.1 高保真静态原型完成**（2026-05-27）
+- 7 个主页面 + 1 登录页 + 6 个 admin 子页全部跑通
+- 10 名 mock 用户、覆盖 6 种角色（含副社长）
 - 编辑部书桌（Editorial Stationery）设计语言落地
 - 无后端，localStorage mock auth
 
-**截图：** `docs/screens/00-09-*.png`
+**截图：** `docs/screens/00-20-*.png`
 **设计文档：** `docs/design/2026-05-21-wireframe.md`
 
 ## 启动
@@ -20,8 +20,8 @@ cd ~/projects/bfsu-ca
 bun dev        # http://localhost:3100
 ```
 
-快速切换角色：登录页底部有 5 个 demo 用户按钮（社长 / 副社长 / 部长 / 学术部长 / 宣传部长）。
-副社长（墨乐 23110301007）和社长（张明 23110301001）登录后侧栏多一个「管理后台」入口。
+快速切换角色：登录页底部有 5 个 demo 用户按钮（社长 / 副社长 / 秘书处 / 部长 / 学术部长）。
+社长（张明 23110301001）、副社长（墨乐 23110301007）、秘书处（林思齐 23110301099）登录后侧栏多一个「管理后台」入口。
 
 ## 路由
 
@@ -31,13 +31,15 @@ bun dev        # http://localhost:3100
 | `/` | Dashboard 主页 | 全员 |
 | `/calendar` | 日历 | 全员 |
 | `/tasks` | 任务看板 | 全员（视图按角色过滤） |
-| `/library` | 资料库（模板 + 归档） | 全员 |
+| `/workspace` | 外联工作区（外联进度 + 书信模版下载） | 全员 |
+| `/library` | 资料库（模板含二级分类 + 归档） | 全员 |
 | `/profile` | 个人中心（任务/活动/学时/文件） | 全员 |
-| `/admin` | 成员管理 | 仅秘书处/社长 |
-| `/admin/events` | 活动管理 | 仅秘书处/社长 |
-| `/admin/credits` | 学时管理 | 仅秘书处/社长 |
-| `/admin/permissions` | 权限设置 | 仅秘书处/社长 |
-| `/admin/announcements` | 系统公告 | 仅秘书处/社长 |
+| `/admin` | 成员管理 | 仅社长/副社长/秘书处 |
+| `/admin/events` | 活动管理 | 仅社长/副社长/秘书处 |
+| `/admin/credits` | 学时管理 | 仅社长/副社长/秘书处 |
+| `/admin/templates` | 模板管理（增删改查） | 仅社长/副社长/秘书处 |
+| `/admin/permissions` | 权限设置 | 仅社长/副社长/秘书处 |
+| `/admin/announcements` | 系统公告 | 仅社长/副社长/秘书处 |
 
 ## 下一步
 
@@ -78,13 +80,15 @@ bfsu-ca/
 │   ├── login/page.tsx
 │   ├── calendar/page.tsx
 │   ├── tasks/page.tsx
-│   ├── library/page.tsx
+│   ├── workspace/page.tsx  # 外联工作区（外联跟踪 + 书信模版）
+│   ├── library/page.tsx    # 资料库（模板二级分类 + 归档）
 │   ├── profile/page.tsx
 │   └── admin/
 │       ├── layout.tsx
 │       ├── page.tsx              # members
 │       ├── events/page.tsx
 │       ├── credits/page.tsx
+│       ├── templates/page.tsx    # 模板 CRUD
 │       ├── permissions/page.tsx
 │       └── announcements/page.tsx
 ├── components/shell/
@@ -92,12 +96,12 @@ bfsu-ca/
 │   ├── TopBar.tsx
 │   └── SideNav.tsx
 ├── lib/
-│   ├── types.ts
+│   ├── types.ts           # 含 LiaisonEntry / TemplateCategory 等新增类型
 │   ├── auth.ts            # localStorage mock auth
 │   └── mock/
 │       ├── users.ts
-│       └── data.ts        # events / tasks / templates / archive / feed / announcements
+│       └── data.ts        # + LIAISONS (11条外联记录) + 6封书信模版
 └── docs/
     ├── design/2026-05-21-wireframe.md
-    └── screens/           # 10 张验证截图
+    └── screens/           # 21 张验证截图
 ```
