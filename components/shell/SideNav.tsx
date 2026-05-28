@@ -8,7 +8,7 @@ import { canSeeAdmin, getStoredUser } from "@/lib/auth";
 import type { User } from "@/lib/types";
 
 const ITEMS = [
-  { href: "/", label: "Dashboard", zh: "主页" },
+  { href: "/dashboard", label: "Dashboard", zh: "主页" },
   { href: "/calendar", label: "Calendar", zh: "日历" },
   { href: "/tasks", label: "Tasks", zh: "任务" },
   { href: "/ideas", label: "Ideas", zh: "创意点子库" },
@@ -25,10 +25,7 @@ export function SideNav() {
     setUser(getStoredUser());
   }, []);
 
-  const isActive = (href: string) => {
-    if (href === "/") return pathname === "/";
-    return pathname.startsWith(href);
-  };
+  const isActive = (href: string) => pathname.startsWith(href) || (href === "/dashboard" && pathname === "/dashboard");
 
   return (
     <aside className="w-52 shrink-0 border-r rule min-h-[calc(100vh-4rem)] sticky top-16 self-start">

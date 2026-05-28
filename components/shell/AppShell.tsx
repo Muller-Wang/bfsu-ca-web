@@ -6,7 +6,7 @@ import { TopBar } from "./TopBar";
 import { SideNav } from "./SideNav";
 import { getStoredUser } from "@/lib/auth";
 
-const PUBLIC_PATHS = ["/login"];
+const PUBLIC_PATHS = ["/login", "/"];
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();

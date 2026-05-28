@@ -1,183 +1,142 @@
-"use client";
-
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { getStoredUser } from "@/lib/auth";
-import { ANNOUNCEMENTS, EVENTS, FEED, TASKS } from "@/lib/mock/data";
-import { EVENT_TAG_META, TASK_STATUS_LABEL, type User } from "@/lib/types";
 
-const WEEKDAYS = ["日", "一", "二", "三", "四", "五", "六"];
-
-function formatChineseDate(d: Date) {
-  return `${d.getFullYear()} 年 ${d.getMonth() + 1} 月 ${d.getDate()} 日 · 星期${WEEKDAYS[d.getDay()]}`;
-}
-
-function formatEnDate(d: Date) {
-  return d.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }).toUpperCase();
-}
-
-export default function DashboardPage() {
-  const [user, setUser] = useState<User | null>(null);
-  const today = new Date("2026-05-21");
-
-  useEffect(() => {
-    setUser(getStoredUser());
-  }, []);
-
-  const upcoming = EVENTS.filter((e) => e.date >= "2026-05-21" && e.tag !== "ddl").slice(0, 3);
-  const myTasks = TASKS.filter((t) => t.assignee === (user?.id || "23110301007") && t.status !== "done").slice(0, 3);
-
+export default function HomePage() {
   return (
-    <div className="px-10 py-10 max-w-6xl">
-      {/* Hero strip */}
-      <div className="rise rise-1">
-        <div className="meta">{formatEnDate(today)}</div>
-        <h1 className="display text-4xl md:text-5xl mt-3">
-          早上好，<span className="italic font-serif">{user?.name || "墨乐"}</span>。
-        </h1>
-        <p className="text-ink-soft mt-2 text-base">
-          今天有 <span className="text-ink font-mono">{myTasks.length}</span> 项待办，本周还有{" "}
-          <span className="text-ink font-mono">2</span> 场活动。
-        </p>
-      </div>
-
-      <hr className="border-t rule my-10" />
-
-      {/* Announcements */}
-      <section className="rise rise-2">
-        <div className="flex items-baseline justify-between mb-5">
-          <h2 className="display text-2xl">置顶公告</h2>
-          <span className="meta">PINNED · {ANNOUNCEMENTS.length}</span>
-        </div>
-        <ul className="space-y-5">
-          {ANNOUNCEMENTS.map((a) => (
-            <li key={a.id} className="grid grid-cols-[auto_1fr] gap-5">
-              <span className="meta pt-1">#{a.id}</span>
-              <div>
-                <p className="text-base leading-relaxed">{a.title}</p>
-                <p className="meta mt-1.5">
-                  {new Date(a.publishedAt).toLocaleString("zh-CN", {
-                    month: "numeric",
-                    day: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                  <span className="mx-2 text-rule">·</span>
-                  {a.author}
-                </p>
-              </div>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      <hr className="border-t rule my-10" />
-
-      {/* Two-column: upcoming + tasks */}
-      <section className="grid grid-cols-1 lg:grid-cols-2 gap-x-10 gap-y-6 rise rise-3">
-        <div>
-          <div className="flex items-baseline justify-between mb-5">
-            <h2 className="display text-2xl">近期活动</h2>
-            <span className="meta">UPCOMING</span>
+    <div className="min-h-screen bg-paper">
+      {/* Navigation bar */}
+      <nav className="border-b rule">
+        <div className="max-w-6xl mx-auto px-10 py-5 flex items-center justify-between">
+          <div className="flex items-baseline gap-3">
+            <span className="display text-xl text-accent">创协</span>
+            <span className="meta text-xs">BFSU CREATIVE ASSOCIATION</span>
           </div>
-          <ul className="space-y-5">
-            {upcoming.map((ev) => {
-              const meta = EVENT_TAG_META[ev.tag];
-              const d = new Date(ev.date);
-              return (
-                <li key={ev.id} className="grid grid-cols-[auto_1fr] gap-4">
-                  <div className="text-right">
-                    <div className="font-serif text-3xl leading-none">{d.getDate()}</div>
-                    <div className="meta mt-1">
-                      {d.toLocaleDateString("en-US", { month: "short" }).toUpperCase()}
-                    </div>
-                  </div>
-                  <div className="border-l rule pl-4">
-                    <div className="flex items-center gap-2">
-                      <span className="dot" style={{ color: meta.color }} />
-                      <span className="meta">{meta.label}</span>
-                    </div>
-                    <div className="text-base mt-1">{ev.title}</div>
-                    <div className="meta mt-1.5">
-                      {ev.start && `${ev.start} · `}
-                      {ev.location && `${ev.location} · `}
-                      {ev.department}
-                    </div>
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
           <Link
-            href="/calendar"
-            className="meta mt-6 inline-flex items-center gap-2 hover:text-accent"
+            href="/login"
+            className="px-5 py-2.5 border rule hover:border-ink hover:text-accent transition-colors text-sm"
           >
-            完整日历 →
+            系统登录 →
           </Link>
         </div>
+      </nav>
 
-        <div className="lg:border-l rule lg:pl-10">
-          <div className="flex items-baseline justify-between mb-5">
-            <h2 className="display text-2xl">我的待办</h2>
-            <span className="meta">MY TASKS</span>
+      {/* Hero */}
+      <section className="max-w-6xl mx-auto px-10 pt-28 pb-20">
+        <div className="max-w-2xl">
+          <div className="meta text-xs mb-4">EST. 2014 · BEIJING FOREIGN STUDIES UNIVERSITY</div>
+          <h1 className="display text-[clamp(3rem,7vw,6rem)] leading-[0.95]">
+            北外创协
+            <br />
+            <span className="text-accent italic font-serif">Creative</span>
+            <br />
+            Association
+          </h1>
+          <p className="mt-8 text-lg text-ink-soft max-w-lg leading-relaxed">
+            北京外国语大学创意协会，成立于 2014 年。以跨文化交流为底色，以内容创意为驱动——策划活动、联结资源、推动创意落地。
+          </p>
+          <div className="flex items-center gap-4 mt-10">
+            <Link
+              href="/login"
+              className="px-8 py-4 bg-accent text-card hover:bg-accent-soft transition-colors text-sm tracking-[0.2em]"
+            >
+              进入系统
+            </Link>
+            <span className="text-sm text-ink-soft">学号登录 · 仅内部成员</span>
           </div>
-          <ul className="space-y-5">
-            {myTasks.map((t) => (
-              <li key={t.id} className="border-b rule pb-4">
-                <div className="flex items-baseline justify-between">
-                  <div className="text-base">{t.title}</div>
-                  <span className="meta">{t.id}</span>
-                </div>
-                <div className="meta mt-1">
-                  {t.department} · DDL {t.ddl}
-                </div>
-                {t.status === "doing" && t.progress != null && (
-                  <div className="mt-2.5">
-                    <div className="flex items-center gap-3">
-                      <div className="flex-1 h-px bg-rule relative">
-                        <div
-                          className="absolute inset-y-0 left-0 bg-accent"
-                          style={{
-                            width: `${t.progress}%`,
-                            height: "2px",
-                            top: "-0.5px",
-                          }}
-                        />
-                      </div>
-                      <span className="meta">{t.progress}%</span>
-                    </div>
-                  </div>
-                )}
-                <div className="meta mt-1.5 text-accent">{TASK_STATUS_LABEL[t.status]}</div>
-              </li>
-            ))}
-          </ul>
-          <Link href="/tasks" className="meta mt-4 inline-flex items-center gap-2 hover:text-accent">
-            查看全部 →
+        </div>
+      </section>
+
+      <hr className="border-t rule max-w-6xl mx-10" />
+
+      {/* What we do */}
+      <section className="max-w-6xl mx-auto px-10 py-20">
+        <div className="meta text-xs mb-6">WHAT WE DO · 我们的工作</div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {[
+            {
+              num: "01",
+              title: "活动策划",
+              en: "Events",
+              desc: "英语角、读书会、文化沙龙、节日庆典——每年 30+ 场跨语种活动，覆盖全校 5000+ 人次。",
+            },
+            {
+              num: "02",
+              title: "外联拓展",
+              en: "Outreach",
+              desc: "连接兄弟社团、企业赞助、基金会与政府单位，为创意寻找资源，让好想法落地。",
+            },
+            {
+              num: "03",
+              title: "内容创作",
+              en: "Content",
+              desc: "公众号运营、多语种内容创作、创意写作——以内容为媒介，传递跨文化视野。",
+            },
+          ].map((item) => (
+            <div key={item.num} className="border-l rule pl-5">
+              <div className="meta text-xs">{item.num}</div>
+              <h3 className="display text-2xl mt-3">{item.title}</h3>
+              <div className="meta italic font-serif text-sm normal-case tracking-normal mt-0.5">{item.en}</div>
+              <p className="mt-3 text-sm text-ink-soft leading-relaxed">{item.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <hr className="border-t rule max-w-6xl mx-10" />
+
+      {/* Departments */}
+      <section className="max-w-6xl mx-auto px-10 py-20">
+        <div className="meta text-xs mb-6">DEPARTMENTS · 部门设置</div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          {[
+            { dept: "秘书处", en: "Secretariat", desc: "学时管理、行政统筹、成员事务" },
+            { dept: "外联部", en: "Outreach Dept.", desc: "企业赞助、校际合作、资源对接" },
+            { dept: "学术部", en: "Academic Dept.", desc: "读书会、课程设计、学术内容" },
+            { dept: "宣传部", en: "Media Dept.", desc: "公众号、视觉设计、品牌传播" },
+          ].map((d) => (
+            <div key={d.dept} className="border rule p-5 bg-card hover:border-ink/40 transition-colors">
+              <h3 className="display text-xl">{d.dept}</h3>
+              <div className="meta italic font-serif text-xs normal-case tracking-normal mt-0.5">{d.en}</div>
+              <p className="mt-3 text-xs text-ink-soft leading-relaxed">{d.desc}</p>
+            </div>
+          ))}
+        </div>
+        <p className="meta mt-4 text-xs">
+          另设有日语部 · 德语部，专注于日本与德语国家文化活动的策划与执行
+        </p>
+      </section>
+
+      <hr className="border-t rule max-w-6xl mx-10" />
+
+      {/* CTA */}
+      <section className="max-w-6xl mx-auto px-10 py-24 text-center">
+        <div className="meta text-xs mb-4">JOIN THE SYSTEM · 内部入口</div>
+        <h2 className="display text-4xl md:text-5xl mb-6">成员登录系统</h2>
+        <p className="text-ink-soft max-w-md mx-auto leading-relaxed text-sm">
+          使用学号与密码登录内网，查看任务、管理活动、下载模板、跟踪外联进度。
+        </p>
+        <Link
+          href="/login"
+          className="inline-block mt-8 px-10 py-4 bg-accent text-card hover:bg-accent-soft transition-colors text-sm tracking-[0.2em]"
+        >
+          登录系统
+        </Link>
+      </section>
+
+      {/* Footer */}
+      <footer className="border-t rule px-10 py-8">
+        <div className="max-w-6xl mx-auto flex items-center justify-between">
+          <div className="meta text-[10px] leading-relaxed">
+            BFSU CREATIVE ASSOCIATION
+            <br />
+            EST. 2014 · BEIJING FOREIGN STUDIES UNIVERSITY
+            <br />
+            INTERNAL SYSTEM v0.1
+          </div>
+          <Link href="/login" className="text-sm border-b rule hover:border-ink transition-colors">
+            系统登录
           </Link>
         </div>
-      </section>
-
-      <hr className="border-t rule my-10" />
-
-      {/* Activity feed */}
-      <section className="rise rise-4">
-        <div className="flex items-baseline justify-between mb-5">
-          <h2 className="display text-2xl">社团动态</h2>
-          <span className="meta">ACTIVITY FEED</span>
-        </div>
-        <ul className="space-y-2.5">
-          {FEED.map((f) => (
-            <li key={f.id} className="grid grid-cols-[auto_auto_1fr] gap-x-4 items-baseline">
-              <span className="meta">{f.at.slice(5)}</span>
-              <span className="text-sm text-ink">{f.who}</span>
-              <span className="text-sm text-ink-soft">{f.what}</span>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      <div className="h-20" />
+      </footer>
     </div>
   );
 }

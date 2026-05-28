@@ -20,14 +20,14 @@ export default function LoginPage() {
       return;
     }
     setLocal(user);
-    router.push("/");
+    router.push("/dashboard");
   };
 
   const quickLogin = (id: string) => {
     const user = USERS.find((u) => u.id === id);
     if (user) {
       setLocal(user);
-      router.push("/");
+      router.push("/dashboard");
     }
   };
 
