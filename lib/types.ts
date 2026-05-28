@@ -62,6 +62,15 @@ export const TASK_STATUS_LABEL: Record<TaskStatus, string> = {
   done: "已完成",
 };
 
+export type TaskCadence = "once" | "weekly" | "biweekly" | "monthly";
+
+export const TASK_CADENCE_LABEL: Record<TaskCadence, string> = {
+  once: "一次性",
+  weekly: "每周",
+  biweekly: "双周",
+  monthly: "每月",
+};
+
 export interface Task {
   id: string;            // T-031
   title: string;
@@ -71,6 +80,7 @@ export interface Task {
   assignee: string;      // user id
   progress?: number;     // 0–100
   description?: string;
+  cadence: TaskCadence;
 }
 
 export interface Announcement {

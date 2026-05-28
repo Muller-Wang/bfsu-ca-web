@@ -4,7 +4,7 @@ import { useState } from "react";
 import clsx from "clsx";
 import { TASKS } from "@/lib/mock/data";
 import { findUser } from "@/lib/mock/users";
-import { TASK_STATUS_LABEL, type Task, type TaskStatus } from "@/lib/types";
+import { TASK_CADENCE_LABEL, TASK_STATUS_LABEL, type Task, type TaskCadence, type TaskStatus } from "@/lib/types";
 
 const COLUMNS: { key: TaskStatus; tone: string }[] = [
   { key: "todo", tone: "text-ink-soft" },
@@ -23,9 +23,12 @@ export default function TasksPage() {
   const [view, setView] = useState<"board" | "list">("board");
   const [dept, setDept] = useState<string>("all");
   const [owner, setOwner] = useState<string>("all");
+  const [cadence, setCadence] = useState<TaskCadence | "all">("all");
 
-  const filtered = TASKS.filter((t) => (dept === "all" || t.department === dept))
-    .filter((t) => owner === "all" || t.assignee === owner);
+  const filtered = TASKS
+    .filter((t) => (dept === "all" || t.department === dept))
+    .filter((t) => owner === "all" || t.assignee === owner)
+    .filter((t) => cadence === "all" || t.cadence === cadence);
 
   const departments = Array.from(new Set(TASKS.map((t) => t.department)));
   const owners = Array.from(new Set(TASKS.map((t) => t.assignee)));
@@ -82,6 +85,21 @@ export default function TasksPage() {
             return <option key={id} value={id}>{u?.name}</option>;
           })}
         </select>
+
+        <div className="flex items-center gap-1 ml-auto text-xs">
+          {(["all", "once", "weekly", "biweekly", "monthly"] as const).map((c) => (
+            <button
+              key={c}
+              onClick={() => setCadence(c)}
+              className={clsx(
+                "px-2.5 py-1.5 border rule transition-colors",
+                cadence === c ? "bg-ink text-card border-ink" : "hover:border-ink"
+              )}
+            >
+              {c === "all" ? "全部" : TASK_CADENCE_LABEL[c]}
+            </button>
+          ))}
+        </div>
       </div>
 
       {view === "board" ? <BoardView tasks={filtered} /> : <ListView tasks={filtered} />}
@@ -118,10 +136,18 @@ function BoardView({ tasks }: { tasks: Task[] }) {
 function TaskCard({ task }: { task: Task }) {
   const assignee = findUser(task.assignee);
   const urgent = isUrgent(task.ddl) && task.status !== "done";
+  const isRecurring = task.cadence !== "once";
   return (
     <article className="bg-card border rule rounded-sm p-3.5 hover:border-ink transition-colors group cursor-pointer">
       <div className="flex items-start justify-between gap-2 mb-2">
-        <span className="meta">{task.id}</span>
+        <div className="flex items-center gap-1.5">
+          <span className="meta">{task.id}</span>
+          {isRecurring && (
+            <span className="text-[10px] border rule px-1 py-0.5 text-accent">
+              {TASK_CADENCE_LABEL[task.cadence]}
+            </span>
+          )}
+        </div>
         {urgent && <span className="meta text-danger">⚠ DDL</span>}
       </div>
       <h4 className="text-[15px] leading-snug mb-3">{task.title}</h4>
@@ -154,19 +180,34 @@ function ListView({ tasks }: { tasks: Task[] }) {
   const sorted = [...tasks].sort((a, b) => a.ddl.localeCompare(b.ddl));
   return (
     <div className="rise rise-3 border-t rule">
+      <div className="grid grid-cols-[100px_1fr_120px_100px_80px_80px_70px] gap-4 items-center py-3 border-b rule px-2">
+        {["ID", "任务", "部门", "DDL", "负责人", "状态", "周期"].map((h) => (
+          <span key={h} className="meta">{h}</span>
+        ))}
+      </div>
       {sorted.map((t) => {
         const assignee = findUser(t.assignee);
         return (
           <div
             key={t.id}
-            className="grid grid-cols-[100px_1fr_140px_120px_100px_80px] gap-4 items-center py-3 border-b rule text-sm hover:bg-card/60 px-2"
+            className="grid grid-cols-[100px_1fr_120px_100px_80px_80px_70px] gap-4 items-center py-3 border-b rule text-sm hover:bg-card/60 px-2"
           >
             <span className="meta">{t.id}</span>
-            <span>{t.title}</span>
-            <span className="text-ink-soft">{t.department}</span>
+            <span className="flex items-center gap-1.5">
+              {t.title}
+              {t.cadence !== "once" && (
+                <span className="text-[10px] border rule px-1 py-0.5 text-accent shrink-0">
+                  {TASK_CADENCE_LABEL[t.cadence]}
+                </span>
+              )}
+            </span>
+            <span className="text-ink-soft text-xs">{t.department}</span>
             <span className="font-mono text-xs">{t.ddl}</span>
-            <span className="meta">{assignee?.name}</span>
-            <span className="meta text-accent">{TASK_STATUS_LABEL[t.status]}</span>
+            <span className="text-xs">{assignee?.name}</span>
+            <span className="meta text-accent text-xs">{TASK_STATUS_LABEL[t.status]}</span>
+            <span className="text-xs text-ink-soft">
+              {t.cadence === "once" ? "—" : TASK_CADENCE_LABEL[t.cadence]}
+            </span>
           </div>
         );
       })}
