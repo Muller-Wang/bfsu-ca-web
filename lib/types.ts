@@ -155,3 +155,34 @@ export interface FeedItem {
   who: string;           // display name
   what: string;
 }
+
+export type IdeaCategory = "activity" | "outreach" | "content" | "internal" | "other";
+
+export const IDEA_CATEGORY_LABEL: Record<IdeaCategory, string> = {
+  activity: "活动创意",
+  outreach: "外联拓展",
+  content: "内容创意",
+  internal: "内部优化",
+  other: "其他",
+};
+
+export interface Idea {
+  id: string;
+  title: string;
+  body: string;
+  authorId?: string;
+  authorName?: string;
+  anonymous: boolean;
+  category: IdeaCategory;
+  createdAt: string;
+  upvotes: number;
+}
+
+export interface IdeaComment {
+  id: string;
+  ideaId: string;
+  body: string;
+  authorName?: string;
+  anonymous: boolean;
+  createdAt: string;
+}
