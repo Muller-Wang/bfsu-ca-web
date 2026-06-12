@@ -2,9 +2,11 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { USERS } from "@/lib/mock/users";
 import { setLocal } from "@/lib/auth";
 import { ROLE_LABEL } from "@/lib/types";
+import { BauhausMark } from "@/components/ui/BauhausMark";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -33,85 +35,113 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex">
-      {/* Left side — editorial banner */}
-      <aside className="hidden md:flex md:w-1/2 bg-card border-r rule px-16 py-20 flex-col justify-between relative overflow-hidden">
-        <div>
-          <div className="meta text-xs">BEIJING FOREIGN STUDIES UNIVERSITY</div>
-          <h1 className="display mt-10 leading-[0.95] text-[clamp(4rem,6.0vw,6.0rem)]">
+      {/* Left panel */}
+      <aside
+        className="hidden md:flex md:w-1/2 flex-col justify-between px-16 py-16 relative overflow-hidden"
+        style={{ background: "var(--color-accent)" }}
+      >
+        <div className="relative z-10">
+          <div
+            className="font-mono text-[11px] tracking-[0.14em] uppercase mb-10"
+            style={{ color: "rgba(255,255,255,0.45)" }}
+          >
+            Beijing Foreign Studies University
+          </div>
+          <h1 className="display text-[clamp(3.5rem,5.5vw,5rem)] leading-[1.0]" style={{ color: "#fff" }}>
             北外创协
             <br />
-            <span className="text-accent italic font-serif">Creative</span>
+            <span className="italic" style={{ color: "var(--color-gold)" }}>Creative</span>
             <br />
             Association
           </h1>
-          <p className="mt-12 text-base text-ink-soft max-w-md leading-relaxed">
-            北外创协的内网和管理系统
-            用于策划、申报、归档、日程安排
+          <p className="mt-8 text-base leading-relaxed max-w-sm" style={{ color: "rgba(255,255,255,0.6)" }}>
+            北外创协的内网与管理系统——用于策划、申报、归档、日程安排。
           </p>
         </div>
 
-        <div className="flex items-end justify-between">
-          <div className="meta text-xs">EST. 2014 · INTERNAL</div>
-          <div className="display text-8xl text-rule select-none">№ 01</div>
+        <div className="relative z-10 flex items-end justify-between">
+          <div className="flex items-center gap-3">
+            <Image src="/bfsu-badge.png" alt="BFSU" width={40} height={40} className="object-contain opacity-80" />
+            <div className="font-mono text-[10px] tracking-widest uppercase leading-loose" style={{ color: "rgba(255,255,255,0.35)" }}>
+              Est. 2014
+              <br />
+              Internal
+            </div>
+          </div>
+          <div className="display text-7xl select-none" style={{ color: "rgba(255,255,255,0.08)" }}>
+            № 01
+          </div>
         </div>
 
-        {/* Decorative rule */}
-        <div className="absolute top-1/2 left-16 right-16 border-t border-rule pointer-events-none" />
+        {/* Bauhaus decoration — bottom-right corner */}
+        <div className="absolute -bottom-16 -right-16 opacity-15" aria-hidden>
+          <BauhausMark size={240} invertColors />
+        </div>
       </aside>
 
-      {/* Right side — login form */}
-      <main className="flex-1 flex items-center justify-center px-10 py-12">
-        <div className="w-full max-w-md">
-          <div className="meta text-xs mb-4">SIGN IN · 登录</div>
-          <h2 className="display text-6xl mb-3 leading-[1.05]">欢迎回来</h2>
-          <p className="text-base text-ink-soft mb-12">使用学号和密码登录系统</p>
+      {/* Right panel — login form */}
+      <main className="flex-1 flex items-center justify-center px-10 py-12 bg-paper">
+        <div className="w-full max-w-md rise rise-1">
+          <div className="meta text-xs mb-4">Sign in · 登录</div>
+          <h2 className="display text-5xl text-ink mb-2 leading-[1.05]">欢迎回来</h2>
+          <p className="text-base text-ink-soft mb-10">使用学号和密码登录系统</p>
 
           <form onSubmit={handleLogin} className="space-y-7">
             <div>
-              <label className="meta text-xs block mb-3">学号 / STUDENT ID</label>
+              <label className="meta text-xs block mb-3">学号 / Student ID</label>
               <input
                 value={studentId}
                 onChange={(e) => setStudentId(e.target.value)}
-                className="w-full bg-transparent border-b rule pb-3 outline-none focus:border-ink font-mono text-lg transition-colors"
+                className="w-full bg-transparent border-b rule pb-3 outline-none font-mono text-[17px] transition-colors"
+                style={{ borderColor: "var(--color-line)", fontFamily: "var(--font-mono)" }}
+                onFocus={(e) => (e.currentTarget.style.borderColor = "var(--color-accent)")}
+                onBlur={(e) => (e.currentTarget.style.borderColor = "var(--color-line)")}
                 placeholder="23110301001"
                 autoComplete="username"
               />
             </div>
 
             <div>
-              <label className="meta text-xs block mb-3">密码 / PASSWORD</label>
+              <label className="meta text-xs block mb-3">密码 / Password</label>
               <input
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 type="password"
-                className="w-full bg-transparent border-b rule pb-3 outline-none focus:border-ink font-mono text-lg transition-colors"
+                className="w-full bg-transparent border-b pb-3 outline-none font-mono text-[17px] transition-colors"
+                style={{ borderColor: "var(--color-line)", fontFamily: "var(--font-mono)" }}
+                onFocus={(e) => (e.currentTarget.style.borderColor = "var(--color-accent)")}
+                onBlur={(e) => (e.currentTarget.style.borderColor = "var(--color-line)")}
                 placeholder="••••••••"
                 autoComplete="current-password"
               />
             </div>
 
-            {error && <div className="text-sm text-danger">{error}</div>}
+            {error && <div className="text-sm" style={{ color: "var(--color-danger)" }}>{error}</div>}
 
             <button
               type="submit"
-              className="w-full mt-4 py-4 bg-ink text-card hover:bg-accent transition-colors text-base tracking-[0.3em]"
+              className="w-full mt-4 py-4 text-base tracking-[0.25em] text-white rounded-[10px] transition-opacity hover:opacity-90 active:scale-[0.99]"
+              style={{ background: "var(--color-accent)" }}
             >
               登 录
             </button>
           </form>
 
-          <div className="mt-12 pt-7 border-t rule">
-            <div className="meta text-xs mb-4">DEMO · 快速切换角色查看</div>
-            <div className="grid grid-cols-1 gap-2">
+          <div className="mt-10 pt-6 border-t rule">
+            <div className="meta text-xs mb-4">Demo · 快速切换角色</div>
+            <div className="grid grid-cols-1 gap-1.5">
               {USERS.slice(0, 5).map((u) => (
                 <button
                   key={u.id}
                   onClick={() => quickLogin(u.id)}
-                  className="text-left px-4 py-2.5 border rule hover:bg-card hover:border-accent transition-colors flex items-center justify-between text-sm"
+                  className="text-left px-4 py-2.5 border rule bg-surface rounded-[8px] transition-colors flex items-center justify-between text-sm group"
+                  style={{ transition: "border-color 0.15s" }}
+                  onMouseEnter={(e) => (e.currentTarget.style.borderColor = "var(--color-accent)")}
+                  onMouseLeave={(e) => (e.currentTarget.style.borderColor = "var(--color-line)")}
                 >
                   <span>
                     {u.name}
-                    <span className="text-ink-soft ml-2 text-xs">{u.department}</span>
+                    <span className="text-ink-mute ml-2 text-xs">{u.department}</span>
                   </span>
                   <span className="meta">{ROLE_LABEL[u.role]}</span>
                 </button>

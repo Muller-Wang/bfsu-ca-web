@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import clsx from "clsx";
 import { canSeeAdmin, getStoredUser } from "@/lib/auth";
 import type { User } from "@/lib/types";
 
@@ -25,58 +24,77 @@ export function SideNav() {
     setUser(getStoredUser());
   }, []);
 
-  const isActive = (href: string) => pathname.startsWith(href) || (href === "/dashboard" && pathname === "/dashboard");
+  const isActive = (href: string) =>
+    pathname === href || (href !== "/dashboard" && pathname.startsWith(href));
 
   return (
-    <aside className="w-52 shrink-0 border-r rule min-h-[calc(100vh-4rem)] sticky top-16 self-start">
-      <nav className="px-6 py-8 flex flex-col gap-1">
-        {ITEMS.map((it) => (
-          <Link
-            key={it.href}
-            href={it.href}
-            className={clsx(
-              "group flex items-baseline justify-between py-2 transition-colors",
-              isActive(it.href) ? "text-accent" : "text-ink hover:text-accent"
-            )}
-          >
-            <span
-              className={clsx(
-                "small-caps text-xs font-mono",
-                isActive(it.href) ? "text-accent" : "text-ink-soft"
-              )}
+    <aside className="w-52 shrink-0 border-r rule min-h-[calc(100vh-4rem)] sticky top-16 self-start flex flex-col">
+      <nav className="px-4 py-6 flex flex-col gap-0.5">
+        {ITEMS.map((it) => {
+          const active = isActive(it.href);
+          return (
+            <Link
+              key={it.href}
+              href={it.href}
+              className="flex items-baseline justify-between px-3 py-2 rounded-[8px] transition-colors"
+              style={{
+                background: active ? "var(--color-accent-wash)" : undefined,
+                color: active ? "var(--color-accent)" : "var(--color-ink)",
+              }}
+              onMouseEnter={(e) => {
+                if (!active) e.currentTarget.style.background = "var(--color-paper-sunken)";
+              }}
+              onMouseLeave={(e) => {
+                if (!active) e.currentTarget.style.background = "";
+              }}
             >
-              {it.label}
-            </span>
-            <span className="text-sm">{it.zh}</span>
-          </Link>
-        ))}
+              <span
+                className="small-caps text-xs font-mono"
+                style={{ color: active ? "var(--color-accent)" : "var(--color-ink-mute)" }}
+              >
+                {it.label}
+              </span>
+              <span className="text-sm">{it.zh}</span>
+            </Link>
+          );
+        })}
 
         {canSeeAdmin(user) && (
           <>
-            <div className="my-4 border-t rule" />
-            <Link
-              href="/admin"
-              className={clsx(
-                "group flex items-baseline justify-between py-2 transition-colors",
-                pathname.startsWith("/admin") ? "text-accent" : "text-ink hover:text-accent"
-              )}
-            >
-              <span
-                className={clsx(
-                  "small-caps text-xs font-mono",
-                  pathname.startsWith("/admin") ? "text-accent" : "text-ink-soft"
-                )}
-              >
-                Admin
-              </span>
-              <span className="text-sm">管理后台</span>
-            </Link>
+            <div className="my-3 border-t rule" />
+            {(() => {
+              const active = pathname.startsWith("/admin");
+              return (
+                <Link
+                  href="/admin"
+                  className="flex items-baseline justify-between px-3 py-2 rounded-[8px] transition-colors"
+                  style={{
+                    background: active ? "var(--color-accent-wash)" : undefined,
+                    color: active ? "var(--color-accent)" : "var(--color-ink)",
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!active) e.currentTarget.style.background = "var(--color-paper-sunken)";
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!active) e.currentTarget.style.background = "";
+                  }}
+                >
+                  <span
+                    className="small-caps text-xs font-mono"
+                    style={{ color: active ? "var(--color-accent)" : "var(--color-ink-mute)" }}
+                  >
+                    Admin
+                  </span>
+                  <span className="text-sm">管理后台</span>
+                </Link>
+              );
+            })()}
           </>
         )}
       </nav>
 
-      <div className="px-6 py-6 mt-auto">
-        <div className="meta text-[10px] leading-relaxed">
+      <div className="mt-auto px-5 py-5 border-t rule">
+        <div className="font-mono leading-loose tracking-widest uppercase" style={{ fontSize: 10, color: "var(--color-ink-mute)" }}>
           BFSU
           <br />
           Creative Association

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Search, Bell, ChevronDown } from "lucide-react";
 import { getStoredUser, setLocal } from "@/lib/auth";
 import { ROLE_LABEL, type User } from "@/lib/types";
 
@@ -16,23 +17,37 @@ export function TopBar() {
   }, []);
 
   return (
-    <header className="border-b rule bg-paper/90 backdrop-blur sticky top-0 z-30">
+    <header
+      className="border-b rule sticky top-0 z-30"
+      style={{ background: "color-mix(in srgb, var(--color-paper) 90%, transparent)", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)" } as React.CSSProperties}
+    >
       <div className="px-6 h-16 flex items-center justify-between">
         <Link href="/" className="flex items-baseline gap-3 select-none">
-          <span className="display text-2xl">创协</span>
-          <span className="meta">BFSU · Creative Association</span>
+          <span className="display text-2xl">
+            <span style={{ color: "var(--color-accent)" }}>创</span>协
+          </span>
+          <span className="meta hidden sm:inline">BFSU · Creative Association</span>
         </Link>
 
-        <div className="flex items-center gap-5">
-          <button className="meta hover:text-ink transition-colors" aria-label="搜索">
-            <span aria-hidden>⌕</span>
-            <span className="ml-2 hidden md:inline">搜索</span>
+        <div className="flex items-center gap-4">
+          <button
+            className="flex items-center gap-1.5 text-ink-soft hover:text-ink transition-colors text-sm"
+            aria-label="搜索"
+          >
+            <Search size={15} strokeWidth={1.75} />
+            <span className="hidden md:inline">搜索</span>
           </button>
 
-          <button className="relative meta hover:text-ink transition-colors" aria-label="通知">
-            <span aria-hidden>◔</span>
-            <span className="ml-2 hidden md:inline">通知</span>
-            <span className="absolute -top-1.5 -right-2 inline-flex items-center justify-center w-4 h-4 rounded-full text-[10px] bg-accent text-card font-mono">
+          <button
+            className="relative flex items-center gap-1.5 text-ink-soft hover:text-ink transition-colors text-sm"
+            aria-label="通知"
+          >
+            <Bell size={15} strokeWidth={1.75} />
+            <span className="hidden md:inline">通知</span>
+            <span
+              className="absolute -top-1.5 -right-2 inline-flex items-center justify-center w-4 h-4 rounded-full text-[9px] text-white font-mono"
+              style={{ background: "var(--color-accent)" }}
+            >
               3
             </span>
           </button>
@@ -41,26 +56,32 @@ export function TopBar() {
             <div className="relative">
               <button
                 onClick={() => setMenuOpen((v) => !v)}
-                className="flex items-center gap-2 group"
+                className="flex items-center gap-2"
               >
-                <span className="w-7 h-7 rounded-full bg-accent/15 text-accent grid place-items-center font-serif text-sm">
+                <span
+                  className="w-7 h-7 rounded-full grid place-items-center font-serif text-sm text-white"
+                  style={{ background: "var(--color-accent)" }}
+                >
                   {user.name.slice(-1)}
                 </span>
-                <span className="hidden md:inline text-sm">{user.name}</span>
-                <span className="meta opacity-60 group-hover:opacity-100">▾</span>
+                <span className="hidden md:inline text-sm text-ink">{user.name}</span>
+                <ChevronDown
+                  size={13}
+                  strokeWidth={2}
+                  className="text-ink-mute transition-transform duration-150"
+                  style={{ transform: menuOpen ? "rotate(180deg)" : "rotate(0deg)" }}
+                />
               </button>
               {menuOpen && (
-                <div className="absolute right-0 top-full mt-2 w-56 bg-card border rule rounded-sm shadow-lg">
-                  <div className="px-3 py-3 border-b rule">
-                    <div className="text-sm">{user.name} · {user.nameEn}</div>
-                    <div className="meta mt-1">
-                      {user.department} · {ROLE_LABEL[user.role]}
-                    </div>
+                <div className="absolute right-0 top-full mt-2 w-56 bg-surface border rule rounded-[10px] shadow-lg overflow-hidden">
+                  <div className="px-4 py-3 border-b rule">
+                    <div className="text-sm font-medium text-ink">{user.name} · {user.nameEn}</div>
+                    <div className="meta mt-1">{user.department} · {ROLE_LABEL[user.role]}</div>
                   </div>
                   <Link
                     href="/profile"
                     onClick={() => setMenuOpen(false)}
-                    className="block px-3 py-2 text-sm hover:bg-paper"
+                    className="block px-4 py-2.5 text-sm text-ink hover:bg-paper transition-colors"
                   >
                     个人中心
                   </Link>
@@ -69,7 +90,10 @@ export function TopBar() {
                       setLocal(null);
                       router.push("/login");
                     }}
-                    className="block w-full text-left px-3 py-2 text-sm hover:bg-paper text-danger"
+                    className="block w-full text-left px-4 py-2.5 text-sm transition-colors"
+                    style={{ color: "var(--color-danger)" }}
+                    onMouseEnter={(e) => (e.currentTarget.style.background = "var(--color-danger-wash)")}
+                    onMouseLeave={(e) => (e.currentTarget.style.background = "")}
                   >
                     退出登录
                   </button>
@@ -77,7 +101,11 @@ export function TopBar() {
               )}
             </div>
           ) : (
-            <Link href="/login" className="text-sm underline decoration-rule underline-offset-4 hover:text-accent">
+            <Link
+              href="/login"
+              className="text-sm text-ink-soft hover:text-ink transition-colors underline underline-offset-4"
+              style={{ textDecorationColor: "var(--color-line)" }}
+            >
               登录
             </Link>
           )}

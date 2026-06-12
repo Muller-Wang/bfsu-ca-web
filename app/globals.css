@@ -1,23 +1,50 @@
 @import "tailwindcss";
 
 @theme {
-  /* Editorial Stationery — warm paper + ink + oxblood accent */
-  --color-paper: #f5f1e8;
-  --color-card: #fcfaf4;
-  --color-ink: #1a1614;
-  --color-ink-soft: #5c5651;
-  --color-rule: #e5dfd0;
-  --color-rule-soft: #ede7d6;
-  --color-accent: #7a1f2e;
-  --color-accent-soft: #a4394a;
-  --color-success: #4a6b3a;
-  --color-warn: #b8731f;
-  --color-danger: #8c2a1f;
+  /* BFSU Design System — Apple/Bauhaus minimalism, indigo + gold palette */
+  --color-paper: #F6F5F1;
+  --color-paper-sunken: #EDECE7;
+  --color-surface: #ffffff;
+  --color-card: #ffffff;
 
-  /* Type stack — distinctive, editorial (next/font wires the variable values) */
+  --color-ink: #1B1A18;
+  --color-ink-soft: #6B6864;
+  --color-ink-mute: #9B9895;
+
+  --color-line: #E7E4DC;
+  --color-line-strong: #C5C1B8;
+  --color-rule: #E7E4DC;
+
+  /* BFSU brand primaries */
+  --color-accent: #282270;
+  --color-accent-soft: #3B358A;
+  --color-accent-wash: #EDEEFF;
+  --color-gold: #F4B81E;
+  --color-gold-deep: #9B6D00;
+
+  /* Semantic */
+  --color-success: #3D6B45;
+  --color-success-wash: #EAF4EC;
+  --color-warn: #B8731F;
+  --color-warn-wash: #FEF3E2;
+  --color-danger: #8C2A1F;
+  --color-danger-wash: #FDECEB;
+
+  /* Categorical dots — departments & event categories */
+  --color-cat-red: #C0392B;
+  --color-cat-amber: #D68910;
+  --color-cat-green: #27AE60;
+  --color-cat-blue: #2980B9;
+  --color-cat-violet: #8E44AD;
+  --color-cat-slate: #7F8C8D;
+
+  /* Type stack (next/font wires the --font-*-display variables) */
   --font-serif: var(--font-serif-display), "Source Han Serif SC", "Songti SC", "SimSun", Georgia, serif;
   --font-sans: var(--font-sans-body), "PingFang SC", "Hiragino Sans GB", -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
   --font-mono: var(--font-mono-data), "SF Mono", "Menlo", "Consolas", monospace;
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 @layer base {
@@ -37,18 +64,7 @@
 
   ::selection {
     background: var(--color-accent);
-    color: var(--color-card);
-  }
-
-  /* Subtle paper grain — overlay noise */
-  body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    opacity: 0.025;
-    z-index: 0;
-    background-image: url("data:image/svg+xml;utf8,<svg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    color: #fff;
   }
 }
 
@@ -68,7 +84,7 @@
     letter-spacing: 0.12em;
   }
 
-  /* Hairline rule, slightly thicker than 1px on retina */
+  /* Hairline divider */
   .rule {
     border-color: var(--color-rule);
   }
@@ -81,16 +97,16 @@
     line-height: 1.05;
   }
 
-  /* Metadata strip — mono, tracked */
+  /* Mono metadata strip */
   .meta {
     font-family: var(--font-mono);
     font-size: 0.6875rem;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: var(--color-ink-soft);
+    color: var(--color-ink-mute);
   }
 
-  /* Tag dot for event categories */
+  /* Category/status dot */
   .dot {
     display: inline-block;
     width: 0.5rem;
@@ -99,13 +115,19 @@
     background: currentColor;
     vertical-align: 1px;
   }
+
+  /* Bauhaus structural top-border for columnar blocks */
+  .col-rule {
+    border-top: 2px solid var(--color-ink);
+    padding-top: 1.25rem;
+  }
 }
 
 /* Page-load reveal */
 @keyframes rise {
   from {
     opacity: 0;
-    transform: translateY(6px);
+    transform: translateY(8px);
   }
   to {
     opacity: 1;
@@ -114,10 +136,14 @@
 }
 
 .rise {
-  animation: rise 0.5s ease-out both;
+  animation: rise 0.5s var(--ease-out) both;
 }
 .rise-1 { animation-delay: 60ms; }
 .rise-2 { animation-delay: 120ms; }
-.rise-3 { animation-delay: 180ms; }
-.rise-4 { animation-delay: 240ms; }
-.rise-5 { animation-delay: 300ms; }
+.rise-3 { animation-delay: 200ms; }
+.rise-4 { animation-delay: 280ms; }
+.rise-5 { animation-delay: 360ms; }
+
+@media (prefers-reduced-motion: reduce) {
+  .rise { animation-duration: 1ms; }
+}
