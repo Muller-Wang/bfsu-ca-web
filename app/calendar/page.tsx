@@ -64,28 +64,61 @@ export default function CalendarPage() {
         <div>
           <div className="meta">CALENDAR · 日历</div>
           <h1 className="display text-4xl mt-2 flex items-baseline gap-4">
-            <button onClick={prev} className="text-ink-soft hover:text-accent">◀</button>
+            <button onClick={prev} className="text-ink-soft hover:text-ink transition-colors">◀</button>
             <span>
               {cursor.y} <span className="italic">/</span> {monthName}
             </span>
-            <button onClick={next} className="text-ink-soft hover:text-accent">▶</button>
+            <button onClick={next} className="text-ink-soft hover:text-ink transition-colors">▶</button>
           </h1>
         </div>
         <div className="flex items-center gap-3">
-          <div className="flex items-center border rule">
+          <div
+            style={{
+              display: "inline-flex",
+              gap: 2,
+              padding: 3,
+              background: "var(--paper-sunken)",
+              borderRadius: 999,
+              border: "1px solid var(--line-faint)",
+            }}
+          >
             {["月", "周", "列表"].map((v, i) => (
               <button
                 key={v}
-                className={clsx(
-                  "px-3 py-1.5 text-sm",
-                  i === 0 ? "bg-ink text-card" : "hover:bg-card"
-                )}
+                style={{
+                  fontFamily: "var(--font-sans)",
+                  fontSize: 13,
+                  padding: "4px 12px",
+                  borderRadius: 999,
+                  border: "none",
+                  cursor: "pointer",
+                  background: i === 0 ? "var(--surface)" : "transparent",
+                  color: i === 0 ? "var(--ink)" : "var(--ink-mute)",
+                  fontWeight: i === 0 ? 500 : 400,
+                  boxShadow: i === 0 ? "var(--shadow-xs)" : "none",
+                  transition: "background 120ms, color 120ms",
+                }}
               >
                 {v}
               </button>
             ))}
           </div>
-          <button className="px-4 py-2 text-sm bg-accent text-card hover:bg-accent-soft transition-colors">
+          <button
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              height: "2rem",
+              padding: "0 1rem",
+              fontSize: 13,
+              fontWeight: 500,
+              color: "#fff",
+              background: "var(--ink)",
+              border: "none",
+              borderRadius: 999,
+              cursor: "pointer",
+              transition: "opacity 120ms",
+            }}
+          >
             + 新建
           </button>
         </div>
