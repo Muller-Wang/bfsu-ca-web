@@ -20,7 +20,7 @@ export default function AdminEventsPage() {
         <h2 className="display text-2xl">
           活动管理 <span className="meta ml-2">{events.length} 项</span>
         </h2>
-        <button className="px-4 py-2 text-sm bg-accent text-card hover:bg-accent-soft transition-colors">
+        <button className="px-4 py-2 text-sm bg-accent text-card hover:bg-accent-soft transition-colors rounded-full">
           + 新建活动
         </button>
       </div>
@@ -97,7 +97,7 @@ export default function AdminEventsPage() {
               </button>
               <button
                 onClick={() => handleDelete(confirmTarget)}
-                className="text-sm px-4 py-2 bg-danger text-card hover:bg-accent transition-colors"
+                className="text-sm px-4 py-2 bg-danger text-card hover:opacity-90 transition-colors rounded-full"
               >
                 确认删除
               </button>

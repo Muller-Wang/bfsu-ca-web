@@ -260,7 +260,7 @@ export default function CalendarPage() {
               >
                 关闭
               </button>
-              <button className="text-sm px-4 py-1.5 bg-ink text-card">
+              <button className="text-sm px-4 py-1.5 bg-ink text-card rounded-full">
                 查看详情
               </button>
             </div>

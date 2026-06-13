@@ -36,11 +36,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   href={it.href}
                   className={clsx(
                     "flex items-baseline justify-between py-2 transition-colors group",
-                    active ? "text-accent" : "text-ink hover:text-accent"
+                    active ? "text-ink font-medium" : "text-ink-soft hover:text-ink"
                   )}
                 >
                   <span className="text-sm">{it.label}</span>
-                  <span className={clsx("meta", active ? "text-accent" : "text-ink-soft")}>
+                  <span className={clsx("meta", active ? "text-ink" : "text-ink-mute")}>
                     {active ? "◆" : ""}
                   </span>
                 </Link>

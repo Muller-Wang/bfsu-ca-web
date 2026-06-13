@@ -39,7 +39,7 @@ export default function AdminTemplatesPage() {
         <h2 className="display text-2xl">模板管理</h2>
         <button
           onClick={() => setShowNew(true)}
-          className="px-4 py-2 text-sm bg-accent text-card hover:bg-accent-soft transition-colors"
+          className="px-4 py-2 text-sm bg-accent text-card hover:bg-accent-soft transition-colors rounded-full"
         >
           + 新增模板
         </button>
@@ -117,7 +117,7 @@ export default function AdminTemplatesPage() {
               </button>
               <button
                 onClick={() => handleDelete(confirmDelete)}
-                className="text-sm px-4 py-2 bg-danger text-card hover:bg-accent transition-colors"
+                className="text-sm px-4 py-2 bg-danger text-card hover:opacity-90 transition-colors rounded-full"
               >
                 确认删除
               </button>
@@ -231,7 +231,7 @@ function TemplateForm({
                   type="button"
                   onClick={() => setForm({ ...form, category: c })}
                   className={clsx(
-                    "px-3 py-1.5 text-sm border rule transition-colors",
+                    "px-3 py-1.5 text-sm border rule rounded-full transition-colors",
                     form.category === c ? "bg-ink text-card border-ink" : "hover:border-ink"
                   )}
                 >
@@ -247,7 +247,7 @@ function TemplateForm({
             </button>
             <button
               type="submit"
-              className="text-sm px-4 py-2 bg-accent text-card hover:bg-accent-soft transition-colors"
+              className="text-sm px-4 py-2 bg-accent text-card hover:bg-accent-soft transition-colors rounded-full"
             >
               {initial ? "保存修改" : "创建模板"}
             </button>

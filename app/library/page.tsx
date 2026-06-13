@@ -81,7 +81,7 @@ function TemplateGrid({ query }: { query: string }) {
               key={c}
               onClick={() => setCat(c)}
               className={clsx(
-                "px-3 py-1.5 border rule transition-colors",
+                "px-3 py-1.5 border rule rounded-full transition-colors",
                 cat === c ? "bg-ink text-card border-ink" : "hover:border-ink"
               )}
             >
