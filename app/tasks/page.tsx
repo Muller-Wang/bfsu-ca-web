@@ -1,22 +1,69 @@
 "use client";
 
 import { useState } from "react";
-import clsx from "clsx";
 import { TASKS } from "@/lib/mock/data";
 import { findUser } from "@/lib/mock/users";
 import { TASK_CADENCE_LABEL, TASK_STATUS_LABEL, type Task, type TaskCadence, type TaskStatus } from "@/lib/types";
 
-const COLUMNS: { key: TaskStatus; tone: string }[] = [
-  { key: "todo", tone: "text-ink-soft" },
-  { key: "doing", tone: "text-accent" },
-  { key: "review", tone: "text-warn" },
-  { key: "done", tone: "text-success" },
+const COLUMNS: { key: TaskStatus; label: string }[] = [
+  { key: "todo",   label: "待办" },
+  { key: "doing",  label: "进行中" },
+  { key: "review", label: "待审核" },
+  { key: "done",   label: "已完成" },
 ];
+
+const CADENCE_FILTERS = [
+  { key: "all",       label: "全部" },
+  { key: "once",      label: "单次" },
+  { key: "weekly",    label: "每周" },
+  { key: "biweekly",  label: "双周" },
+  { key: "monthly",   label: "每月" },
+] as const;
 
 function isUrgent(ddl: string) {
   const d = new Date(ddl).getTime();
   const today = new Date("2026-05-21").getTime();
   return d - today < 24 * 3600 * 1000 * 2 && d >= today;
+}
+
+/* Reusable pill segmented control */
+function PillGroup<T extends string>({
+  options,
+  value,
+  onChange,
+}: {
+  options: { key: T; label: string }[];
+  value: T;
+  onChange: (v: T) => void;
+}) {
+  return (
+    <div style={{ display: "inline-flex", gap: 2, padding: 3, background: "var(--paper-sunken)", borderRadius: 999, border: "1px solid var(--line-faint)" }}>
+      {options.map(({ key, label }) => {
+        const active = value === key;
+        return (
+          <button
+            key={key}
+            onClick={() => onChange(key)}
+            style={{
+              fontFamily: "var(--font-sans)",
+              fontSize: 13,
+              padding: "4px 12px",
+              borderRadius: 999,
+              border: "none",
+              cursor: "pointer",
+              background: active ? "var(--surface)" : "transparent",
+              color: active ? "var(--ink)" : "var(--ink-mute)",
+              fontWeight: active ? 500 : 400,
+              boxShadow: active ? "var(--shadow-xs)" : "none",
+              transition: "background 120ms, color 120ms",
+            }}
+          >
+            {label}
+          </button>
+        );
+      })}
+    </div>
+  );
 }
 
 export default function TasksPage() {
@@ -26,7 +73,7 @@ export default function TasksPage() {
   const [cadence, setCadence] = useState<TaskCadence | "all">("all");
 
   const filtered = TASKS
-    .filter((t) => (dept === "all" || t.department === dept))
+    .filter((t) => dept === "all" || t.department === dept)
     .filter((t) => owner === "all" || t.assignee === owner)
     .filter((t) => cadence === "all" || t.cadence === cadence);
 
@@ -41,43 +88,36 @@ export default function TasksPage() {
           <div className="meta">TASKS · 任务看板</div>
           <h1 className="display text-4xl mt-2">任务</h1>
         </div>
-        <button className="px-4 py-2 text-sm bg-accent text-card hover:bg-accent-soft transition-colors">
+        <button
+          style={{ display: "inline-flex", alignItems: "center", height: "2rem", padding: "0 1rem", fontSize: 13, fontWeight: 500, color: "#fff", background: "var(--ink)", border: "none", borderRadius: 999, cursor: "pointer" }}
+        >
           + 新建任务
         </button>
       </div>
 
       {/* Toolbar */}
-      <div className="rise rise-2 flex items-center gap-3 mt-6 mb-8">
-        <div className="flex items-center border rule">
-          <button
-            onClick={() => setView("board")}
-            className={clsx("px-3 py-1.5 text-sm", view === "board" ? "bg-ink text-card" : "hover:bg-card")}
-          >
-            看板
-          </button>
-          <button
-            onClick={() => setView("list")}
-            className={clsx("px-3 py-1.5 text-sm", view === "list" ? "bg-ink text-card" : "hover:bg-card")}
-          >
-            列表
-          </button>
-        </div>
+      <div className="rise rise-2 flex items-center gap-4 mt-6 mb-8 flex-wrap">
+        <PillGroup
+          options={[{ key: "board", label: "看板" }, { key: "list", label: "列表" }]}
+          value={view}
+          onChange={setView}
+        />
 
         <select
           value={dept}
           onChange={(e) => setDept(e.target.value)}
           className="bg-transparent border-b rule pb-1 text-sm focus:border-ink outline-none"
+          style={{ borderColor: "var(--line)", fontFamily: "var(--font-sans)" }}
         >
           <option value="all">部门 · 全部</option>
-          {departments.map((d) => (
-            <option key={d} value={d}>{d}</option>
-          ))}
+          {departments.map((d) => <option key={d} value={d}>{d}</option>)}
         </select>
 
         <select
           value={owner}
           onChange={(e) => setOwner(e.target.value)}
           className="bg-transparent border-b rule pb-1 text-sm focus:border-ink outline-none"
+          style={{ borderColor: "var(--line)", fontFamily: "var(--font-sans)" }}
         >
           <option value="all">人员 · 全部</option>
           {owners.map((id) => {
@@ -86,19 +126,12 @@ export default function TasksPage() {
           })}
         </select>
 
-        <div className="flex items-center gap-1 ml-auto text-xs">
-          {(["all", "once", "weekly", "biweekly", "monthly"] as const).map((c) => (
-            <button
-              key={c}
-              onClick={() => setCadence(c)}
-              className={clsx(
-                "px-2.5 py-1.5 border rule transition-colors",
-                cadence === c ? "bg-ink text-card border-ink" : "hover:border-ink"
-              )}
-            >
-              {c === "all" ? "全部" : TASK_CADENCE_LABEL[c]}
-            </button>
-          ))}
+        <div className="ml-auto">
+          <PillGroup
+            options={CADENCE_FILTERS as unknown as { key: TaskCadence | "all"; label: string }[]}
+            value={cadence}
+            onChange={setCadence}
+          />
         </div>
       </div>
 
@@ -115,13 +148,11 @@ function BoardView({ tasks }: { tasks: Task[] }) {
         return (
           <div key={col.key} className="min-w-0">
             <div className="flex items-baseline justify-between border-b rule pb-3 mb-4">
-              <h3 className={clsx("display text-lg", col.tone)}>{TASK_STATUS_LABEL[col.key]}</h3>
+              <h3 className="text-base font-medium text-ink">{col.label}</h3>
               <span className="meta">{String(list.length).padStart(2, "0")}</span>
             </div>
             <div className="space-y-3">
-              {list.map((t) => (
-                <TaskCard key={t.id} task={t} />
-              ))}
+              {list.map((t) => <TaskCard key={t.id} task={t} />)}
               {list.length === 0 && (
                 <div className="meta text-center py-6 border border-dashed rule">空</div>
               )}
@@ -138,17 +169,27 @@ function TaskCard({ task }: { task: Task }) {
   const urgent = isUrgent(task.ddl) && task.status !== "done";
   const isRecurring = task.cadence !== "once";
   return (
-    <article className="bg-card border rule rounded-sm p-3.5 hover:border-ink transition-colors group cursor-pointer">
+    <article className="bg-card border rule rounded-[10px] p-3.5 hover:border-ink transition-colors cursor-pointer">
       <div className="flex items-start justify-between gap-2 mb-2">
         <div className="flex items-center gap-1.5">
           <span className="meta">{task.id}</span>
           {isRecurring && (
-            <span className="text-[10px] border rule px-1 py-0.5 text-accent">
+            <span
+              style={{
+                fontSize: 10,
+                border: "1px solid var(--line)",
+                padding: "1px 5px",
+                borderRadius: 4,
+                color: "var(--ink-soft)",
+                fontFamily: "var(--font-mono)",
+                letterSpacing: "0.06em",
+              }}
+            >
               {TASK_CADENCE_LABEL[task.cadence]}
             </span>
           )}
         </div>
-        {urgent && <span className="meta text-danger">⚠ DDL</span>}
+        {urgent && <span className="meta" style={{ color: "var(--color-danger)" }}>⚠ DDL</span>}
       </div>
       <h4 className="text-[15px] leading-snug mb-3">{task.title}</h4>
       <div className="meta mb-2">{task.department}</div>
@@ -156,8 +197,8 @@ function TaskCard({ task }: { task: Task }) {
         <div className="mb-3">
           <div className="flex-1 h-px bg-rule relative">
             <div
-              className="absolute left-0 -top-px h-0.5 bg-accent"
-              style={{ width: `${task.progress}%` }}
+              className="absolute left-0 -top-px h-0.5"
+              style={{ width: `${task.progress}%`, background: "var(--ink)" }}
             />
           </div>
           <div className="meta mt-1.5">{task.progress}%</div>
@@ -166,7 +207,19 @@ function TaskCard({ task }: { task: Task }) {
       <div className="flex items-center justify-between text-xs">
         <span className="font-mono text-ink-soft">DDL {task.ddl.slice(5)}</span>
         <span className="flex items-center gap-1.5">
-          <span className="w-5 h-5 rounded-full bg-accent/15 text-accent grid place-items-center text-[10px]">
+          <span
+            style={{
+              width: 20,
+              height: 20,
+              borderRadius: 999,
+              background: "var(--paper-sunken)",
+              color: "var(--ink-soft)",
+              display: "grid",
+              placeItems: "center",
+              fontSize: 10,
+              fontFamily: "var(--font-sans)",
+            }}
+          >
             {assignee?.name.slice(-1)}
           </span>
           <span className="text-ink-soft">{assignee?.name}</span>
@@ -196,7 +249,7 @@ function ListView({ tasks }: { tasks: Task[] }) {
             <span className="flex items-center gap-1.5">
               {t.title}
               {t.cadence !== "once" && (
-                <span className="text-[10px] border rule px-1 py-0.5 text-accent shrink-0">
+                <span style={{ fontSize: 10, border: "1px solid var(--line)", padding: "1px 5px", borderRadius: 4, color: "var(--ink-soft)", fontFamily: "var(--font-mono)", whiteSpace: "nowrap" }}>
                   {TASK_CADENCE_LABEL[t.cadence]}
                 </span>
               )}
@@ -204,7 +257,7 @@ function ListView({ tasks }: { tasks: Task[] }) {
             <span className="text-ink-soft text-xs">{t.department}</span>
             <span className="font-mono text-xs">{t.ddl}</span>
             <span className="text-xs">{assignee?.name}</span>
-            <span className="meta text-accent text-xs">{TASK_STATUS_LABEL[t.status]}</span>
+            <span className="meta text-xs">{TASK_STATUS_LABEL[t.status]}</span>
             <span className="text-xs text-ink-soft">
               {t.cadence === "once" ? "—" : TASK_CADENCE_LABEL[t.cadence]}
             </span>

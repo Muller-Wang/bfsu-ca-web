@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import clsx from "clsx";
 import { IDEAS, IDEA_COMMENTS } from "@/lib/mock/data";
 import {
   IDEA_CATEGORY_LABEL,
@@ -11,6 +10,54 @@ import {
 } from "@/lib/types";
 
 type SortKey = "latest" | "hot";
+
+const CATEGORY_FILTERS = [
+  { key: "all" as const,        label: "全部" },
+  { key: "activity" as const,   label: "活动" },
+  { key: "outreach" as const,   label: "外联" },
+  { key: "content" as const,    label: "内容" },
+  { key: "internal" as const,   label: "内部" },
+  { key: "other" as const,      label: "其他" },
+];
+
+function PillGroup<T extends string>({
+  options,
+  value,
+  onChange,
+}: {
+  options: { key: T; label: string }[];
+  value: T;
+  onChange: (v: T) => void;
+}) {
+  return (
+    <div style={{ display: "inline-flex", gap: 2, padding: 3, background: "var(--paper-sunken)", borderRadius: 999, border: "1px solid var(--line-faint)" }}>
+      {options.map(({ key, label }) => {
+        const active = value === key;
+        return (
+          <button
+            key={key}
+            onClick={() => onChange(key)}
+            style={{
+              fontFamily: "var(--font-sans)",
+              fontSize: 13,
+              padding: "4px 12px",
+              borderRadius: 999,
+              border: "none",
+              cursor: "pointer",
+              background: active ? "var(--surface)" : "transparent",
+              color: active ? "var(--ink)" : "var(--ink-mute)",
+              fontWeight: active ? 500 : 400,
+              boxShadow: active ? "var(--shadow-xs)" : "none",
+              transition: "background 120ms, color 120ms",
+            }}
+          >
+            {label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
 
 export default function IdeasPage() {
   const [cat, setCat] = useState<IdeaCategory | "all">("all");
@@ -54,7 +101,7 @@ export default function IdeasPage() {
         </div>
         <button
           onClick={() => setShowNew(true)}
-          className="px-4 py-2 text-sm bg-accent text-card hover:bg-accent-soft transition-colors shrink-0"
+          style={{ display: "inline-flex", alignItems: "center", height: "2rem", padding: "0 1rem", fontSize: 13, fontWeight: 500, color: "#fff", background: "var(--ink)", border: "none", borderRadius: 999, cursor: "pointer", flexShrink: 0 }}
         >
           + 提交点子
         </button>
@@ -63,38 +110,17 @@ export default function IdeasPage() {
       <hr className="border-t rule my-8" />
 
       {/* Filters */}
-      <div className="rise rise-2 flex items-center justify-between mb-8">
-        <div className="flex items-center gap-1 text-xs">
-          {(["all", "activity", "outreach", "content", "internal", "other"] as const).map((c) => (
-            <button
-              key={c}
-              onClick={() => setCat(c)}
-              className={clsx(
-                "px-3 py-1.5 border rule transition-colors",
-                cat === c ? "bg-ink text-card border-ink" : "hover:border-ink"
-              )}
-            >
-              {c === "all" ? "全部" : IDEA_CATEGORY_LABEL[c]}
-            </button>
-          ))}
-        </div>
-        <div className="flex items-center gap-1 text-xs">
-          {([
-            { key: "latest", label: "最新" },
-            { key: "hot", label: "最热" },
-          ] as const).map((s) => (
-            <button
-              key={s.key}
-              onClick={() => setSort(s.key)}
-              className={clsx(
-                "px-3 py-1.5 border rule transition-colors",
-                sort === s.key ? "bg-ink text-card border-ink" : "hover:border-ink"
-              )}
-            >
-              {s.label}
-            </button>
-          ))}
-        </div>
+      <div className="rise rise-2 flex items-center justify-between mb-8 gap-4 flex-wrap">
+        <PillGroup
+          options={CATEGORY_FILTERS as { key: IdeaCategory | "all"; label: string }[]}
+          value={cat}
+          onChange={setCat}
+        />
+        <PillGroup
+          options={[{ key: "latest" as SortKey, label: "最新" }, { key: "hot" as SortKey, label: "最热" }]}
+          value={sort}
+          onChange={setSort}
+        />
       </div>
 
       {/* Idea cards */}
@@ -102,21 +128,17 @@ export default function IdeasPage() {
         {filtered.map((idea) => {
           const ideaComments = comments.filter((c) => c.ideaId === idea.id);
           const isExpanded = expanded === idea.id;
-
           return (
             <article
               key={idea.id}
-              className={clsx(
-                "border rule bg-card hover:border-ink/40 transition-all duration-200",
-                isExpanded && "border-ink/30"
-              )}
+              className="border rule bg-card transition-all duration-200 rounded-[10px]"
+              style={{ borderColor: isExpanded ? "var(--line-strong)" : undefined }}
             >
-              {/* Card body */}
               <div className="px-6 py-5">
                 <div className="flex items-start justify-between gap-4">
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="text-xs border rule px-2 py-0.5 text-ink-soft">
+                      <span className="text-xs border rule px-2 py-0.5 text-ink-soft rounded-[4px]">
                         {IDEA_CATEGORY_LABEL[idea.category]}
                       </span>
                       {idea.anonymous ? (
@@ -127,18 +149,15 @@ export default function IdeasPage() {
                       <span className="meta">{idea.createdAt}</span>
                     </div>
                     <h3 className="text-base mb-1.5">{idea.title}</h3>
-                    <p
-                      className={clsx(
-                        "text-sm text-ink-soft leading-relaxed",
-                        !isExpanded && "line-clamp-3"
-                      )}
-                    >
+                    <p className={`text-sm text-ink-soft leading-relaxed ${!isExpanded ? "line-clamp-3" : ""}`}>
                       {idea.body}
                     </p>
                     {!isExpanded && idea.body.length > 150 && (
                       <button
                         onClick={() => setExpanded(idea.id)}
-                        className="text-xs text-accent border-b rule hover:border-accent mt-1"
+                        style={{ fontSize: 12, color: "var(--ink-soft)", background: "none", border: "none", borderBottom: "1px solid var(--line)", cursor: "pointer", padding: "2px 0", marginTop: 4, transition: "color 120ms, border-color 120ms" }}
+                        onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = "var(--ink)"; (e.currentTarget as HTMLElement).style.borderColor = "var(--ink)"; }}
+                        onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = "var(--ink-soft)"; (e.currentTarget as HTMLElement).style.borderColor = "var(--line)"; }}
                       >
                         展开全文
                       </button>
@@ -150,16 +169,20 @@ export default function IdeasPage() {
                 <div className="flex items-center gap-5 mt-4 pt-3 border-t rule">
                   <button
                     onClick={() => handleUpvote(idea.id)}
-                    className="flex items-center gap-1.5 text-sm hover:text-accent transition-colors"
+                    className="flex items-center gap-1.5 text-sm text-ink-soft transition-colors"
+                    style={{ background: "none", border: "none", cursor: "pointer" }}
+                    onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.color = "var(--ink)")}
+                    onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.color = "var(--ink-soft)")}
                   >
                     <span className="meta">▲</span>
                     <span className="font-mono text-xs">{idea.upvotes}</span>
                   </button>
                   <button
-                    onClick={() =>
-                      setExpanded(isExpanded ? null : idea.id)
-                    }
-                    className="flex items-center gap-1.5 text-sm text-ink-soft hover:text-ink transition-colors"
+                    onClick={() => setExpanded(isExpanded ? null : idea.id)}
+                    className="flex items-center gap-1.5 text-sm text-ink-soft transition-colors"
+                    style={{ background: "none", border: "none", cursor: "pointer" }}
+                    onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.color = "var(--ink)")}
+                    onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.color = "var(--ink-soft)")}
                   >
                     <span className="meta">◇</span>
                     <span className="font-mono text-xs">{ideaComments.length}</span>
@@ -167,10 +190,9 @@ export default function IdeasPage() {
                 </div>
               </div>
 
-              {/* Expanded: comment section */}
+              {/* Expanded: comments */}
               {isExpanded && (
                 <div className="px-6 pb-5 border-t rule">
-                  {/* Existing comments */}
                   {ideaComments.length > 0 && (
                     <div className="mt-4 space-y-3">
                       {ideaComments.map((c) => (
@@ -186,12 +208,7 @@ export default function IdeasPage() {
                       ))}
                     </div>
                   )}
-
-                  {/* New comment */}
-                  <CommentForm
-                    ideaId={idea.id}
-                    onSubmit={handleAddComment}
-                  />
+                  <CommentForm ideaId={idea.id} onSubmit={handleAddComment} />
                 </div>
               )}
             </article>
@@ -203,24 +220,14 @@ export default function IdeasPage() {
         )}
       </div>
 
-      {/* New idea modal */}
       {showNew && (
-        <NewIdeaForm
-          onSubmit={handleAddIdea}
-          onCancel={() => setShowNew(false)}
-        />
+        <NewIdeaForm onSubmit={handleAddIdea} onCancel={() => setShowNew(false)} />
       )}
     </div>
   );
 }
 
-function CommentForm({
-  ideaId,
-  onSubmit,
-}: {
-  ideaId: string;
-  onSubmit: (ideaId: string, comment: IdeaComment) => void;
-}) {
+function CommentForm({ ideaId, onSubmit }: { ideaId: string; onSubmit: (id: string, c: IdeaComment) => void }) {
   const [body, setBody] = useState("");
   const [anonymous, setAnonymous] = useState(false);
 
@@ -252,7 +259,7 @@ function CommentForm({
             type="checkbox"
             checked={anonymous}
             onChange={(e) => setAnonymous(e.target.checked)}
-            className="accent-accent w-3 h-3"
+            className="w-3 h-3"
           />
           <span className="text-xs text-ink-soft">匿名评论</span>
         </label>
@@ -260,7 +267,9 @@ function CommentForm({
       <button
         type="submit"
         disabled={!body.trim()}
-        className="text-sm px-3 py-1 border rule hover:border-ink disabled:opacity-30 disabled:cursor-not-allowed transition-colors shrink-0"
+        style={{ fontSize: 13, padding: "4px 14px", border: "1px solid var(--line)", borderRadius: 999, cursor: "pointer", background: "transparent", color: "var(--ink-soft)", transition: "border-color 120ms, color 120ms" }}
+        onMouseEnter={(e) => { if (body.trim()) { (e.currentTarget as HTMLElement).style.borderColor = "var(--ink)"; (e.currentTarget as HTMLElement).style.color = "var(--ink)"; } }}
+        onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "var(--line)"; (e.currentTarget as HTMLElement).style.color = "var(--ink-soft)"; }}
       >
         发送
       </button>
@@ -268,13 +277,7 @@ function CommentForm({
   );
 }
 
-function NewIdeaForm({
-  onSubmit,
-  onCancel,
-}: {
-  onSubmit: (idea: Idea) => void;
-  onCancel: () => void;
-}) {
+function NewIdeaForm({ onSubmit, onCancel }: { onSubmit: (idea: Idea) => void; onCancel: () => void }) {
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [category, setCategory] = useState<IdeaCategory>("activity");
@@ -297,15 +300,17 @@ function NewIdeaForm({
 
   return (
     <div
-      className="fixed inset-0 bg-ink/40 backdrop-blur-sm grid place-items-center z-50 px-6"
+      className="fixed inset-0 backdrop-blur-sm grid place-items-center z-50 px-6"
+      style={{ background: "rgba(29,29,31,0.4)" }}
       onClick={onCancel}
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="bg-card border rule rounded-sm max-w-lg w-full shadow-2xl"
+        className="bg-surface border rule max-w-lg w-full"
+        style={{ borderRadius: 16, boxShadow: "var(--shadow-lg)" }}
       >
         <div className="px-7 py-6 border-b rule">
-          <div className="meta mb-2">NEW IDEA · 提交点子</div>
+          <div className="meta mb-2">New Idea · 提交点子</div>
           <h3 className="display text-2xl">新创意</h3>
         </div>
         <form onSubmit={handleSubmit} className="px-7 py-5 space-y-4">
@@ -325,7 +330,7 @@ function NewIdeaForm({
               value={body}
               onChange={(e) => setBody(e.target.value)}
               rows={5}
-              className="w-full bg-transparent border rule p-3 outline-none focus:border-ink text-sm resize-none"
+              className="w-full bg-transparent border rule p-3 outline-none focus:border-ink text-sm resize-none rounded-[8px]"
               placeholder="展开说说：背景、具体怎么做、预期效果…"
               required
             />
@@ -349,20 +354,26 @@ function NewIdeaForm({
                   type="checkbox"
                   checked={anonymous}
                   onChange={(e) => setAnonymous(e.target.checked)}
-                  className="accent-accent w-4 h-4"
+                  className="w-4 h-4"
                 />
                 <span className="text-sm text-ink-soft">匿名提交</span>
               </label>
             </div>
           </div>
           <div className="flex justify-end gap-3 pt-4 border-t rule">
-            <button type="button" onClick={onCancel} className="text-sm px-4 py-2 hover:text-ink">
+            <button
+              type="button"
+              onClick={onCancel}
+              style={{ fontSize: 13, padding: "6px 16px", border: "none", borderRadius: 999, cursor: "pointer", background: "transparent", color: "var(--ink-soft)", transition: "color 120ms" }}
+              onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.color = "var(--ink)")}
+              onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.color = "var(--ink-soft)")}
+            >
               取消
             </button>
             <button
               type="submit"
               disabled={!title.trim() || !body.trim()}
-              className="text-sm px-4 py-2 bg-accent text-card hover:bg-accent-soft transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              style={{ fontSize: 13, padding: "6px 20px", border: "none", borderRadius: 999, cursor: "pointer", background: "var(--ink)", color: "#fff", opacity: (!title.trim() || !body.trim()) ? 0.4 : 1, transition: "opacity 120ms" }}
             >
               提交点子
             </button>

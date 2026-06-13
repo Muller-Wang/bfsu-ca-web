@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import clsx from "clsx";
 import { LIAISONS, TEMPLATES } from "@/lib/mock/data";
 import {
   LIAISON_CATEGORY_LABEL,
@@ -18,6 +17,53 @@ const EXT_BADGE: Record<string, string> = {
   xlsx: "XLS",
 };
 
+function PillGroup<T extends string>({
+  options,
+  value,
+  onChange,
+}: {
+  options: { key: T; label: string }[];
+  value: T;
+  onChange: (v: T) => void;
+}) {
+  return (
+    <div style={{ display: "inline-flex", gap: 2, padding: 3, background: "var(--paper-sunken)", borderRadius: 999, border: "1px solid var(--line-faint)" }}>
+      {options.map(({ key, label }) => {
+        const active = value === key;
+        return (
+          <button
+            key={key}
+            onClick={() => onChange(key)}
+            style={{
+              fontFamily: "var(--font-sans)",
+              fontSize: 13,
+              padding: "4px 12px",
+              borderRadius: 999,
+              border: "none",
+              cursor: "pointer",
+              background: active ? "var(--surface)" : "transparent",
+              color: active ? "var(--ink)" : "var(--ink-mute)",
+              fontWeight: active ? 500 : 400,
+              boxShadow: active ? "var(--shadow-xs)" : "none",
+              transition: "background 120ms, color 120ms",
+            }}
+          >
+            {label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+const CAT_OPTIONS = [
+  { key: "all" as const,          label: "全部" },
+  { key: "club" as const,         label: "社团" },
+  { key: "enterprise" as const,   label: "企业" },
+  { key: "foundation" as const,   label: "基金会" },
+  { key: "government" as const,   label: "政府" },
+];
+
 export default function WorkspacePage() {
   const [cat, setCat] = useState<LiaisonCategory | "all">("all");
   const [statusFilter, setStatusFilter] = useState<LiaisonStatus | "all">("all");
@@ -30,65 +76,65 @@ export default function WorkspacePage() {
 
   const letterTemplates = TEMPLATES.filter((t) => t.category === "letter");
 
-  const activeCount = LIAISONS.filter((l) => l.status === "cooperating" || l.status === "negotiating").length;
+  const activeCount    = LIAISONS.filter((l) => l.status === "cooperating" || l.status === "negotiating").length;
   const completedCount = LIAISONS.filter((l) => l.status === "completed").length;
-  const pendingCount = LIAISONS.filter((l) => l.status === "contacting").length;
+  const pendingCount   = LIAISONS.filter((l) => l.status === "contacting").length;
 
   return (
     <div className="px-10 py-10 max-w-6xl">
       {/* Header */}
-      <div className="rise rise-1 flex items-end justify-between mb-3">
-        <div>
-          <div className="meta">WORKSPACE · 外联工作区</div>
-          <h1 className="display text-4xl mt-2">外联工作区</h1>
-          <p className="meta mt-2">跟踪社团 / 企业 / 基金会 / 政府单位外联进度</p>
-        </div>
+      <div className="rise rise-1 mb-3">
+        <div className="meta">WORKSPACE · 外联工作区</div>
+        <h1 className="display text-4xl mt-2">外联工作区</h1>
+        <p className="meta mt-2">跟踪社团 / 企业 / 基金会 / 政府单位外联进度</p>
       </div>
 
       <hr className="border-t rule my-8" />
 
       {/* KPI Cards */}
       <div className="rise rise-2 grid grid-cols-3 gap-5 mb-8">
-        <div className="border rule bg-card p-5">
-          <div className="meta mb-1">进行中</div>
-          <div className="display text-4xl text-accent">{activeCount}</div>
-          <div className="meta mt-1 text-xs">合作 + 洽谈</div>
-        </div>
-        <div className="border rule bg-card p-5">
-          <div className="meta mb-1">已完成</div>
-          <div className="display text-4xl text-success">{completedCount}</div>
-          <div className="meta mt-1 text-xs">历史合作</div>
-        </div>
-        <div className="border rule bg-card p-5">
-          <div className="meta mb-1">待跟进</div>
-          <div className="display text-4xl text-warn">{pendingCount}</div>
-          <div className="meta mt-1 text-xs">新接洽</div>
-        </div>
+        {[
+          { label: "进行中", count: activeCount,    sub: "合作 + 洽谈" },
+          { label: "已完成", count: completedCount, sub: "历史合作" },
+          { label: "待跟进", count: pendingCount,   sub: "新接洽" },
+        ].map(({ label, count, sub }) => (
+          <div
+            key={label}
+            style={{ border: "1px solid var(--line)", borderRadius: 16, background: "var(--surface)", padding: "20px 24px" }}
+          >
+            <div className="meta mb-1">{label}</div>
+            <div
+              style={{
+                fontFamily: "var(--font-sans)",
+                fontSize: 44,
+                fontWeight: 600,
+                letterSpacing: "-0.03em",
+                lineHeight: 1,
+                color: "var(--ink)",
+                fontFeatureSettings: '"tnum"',
+              }}
+            >
+              {count}
+            </div>
+            <div className="meta mt-1 text-xs">{sub}</div>
+          </div>
+        ))}
       </div>
 
       <div className="grid grid-cols-[1fr_300px] gap-10">
         {/* Main: liaison list */}
         <section className="rise rise-3 min-w-0">
-          {/* Filters */}
-          <div className="flex items-center gap-4 mb-6">
-            <div className="flex items-center gap-1 text-xs">
-              {(["all", "club", "enterprise", "foundation", "government"] as const).map((c) => (
-                <button
-                  key={c}
-                  onClick={() => setCat(c)}
-                  className={clsx(
-                    "px-3 py-1.5 border rule transition-colors",
-                    cat === c ? "bg-ink text-card border-ink" : "hover:border-ink"
-                  )}
-                >
-                  {c === "all" ? "全部" : LIAISON_CATEGORY_LABEL[c]}
-                </button>
-              ))}
-            </div>
+          <div className="flex items-center gap-4 mb-6 flex-wrap">
+            <PillGroup
+              options={CAT_OPTIONS as { key: LiaisonCategory | "all"; label: string }[]}
+              value={cat}
+              onChange={setCat}
+            />
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value as LiaisonStatus | "all")}
               className="bg-transparent border-b rule pb-1 focus:border-ink outline-none text-sm"
+              style={{ borderColor: "var(--line)", fontFamily: "var(--font-sans)" }}
             >
               <option value="all">状态 · 全部</option>
               {Object.entries(LIAISON_STATUS_LABEL).map(([k, v]) => (
@@ -124,9 +170,7 @@ export default function WorkspacePage() {
                   {l.contactRole && <span className="text-ink-soft ml-1">({l.contactRole})</span>}
                 </span>
                 <span className="text-xs text-ink-soft leading-relaxed">{l.notes}</span>
-                <span className="text-xs text-accent">
-                  {l.nextStep || "—"}
-                </span>
+                <span className="text-xs text-ink-soft">{l.nextStep || "—"}</span>
               </div>
             ))}
 
@@ -139,31 +183,57 @@ export default function WorkspacePage() {
         {/* Sidebar: letter templates */}
         <aside className="rise rise-3">
           <div className="meta mb-4">书信模版 · 快速下载</div>
-          <div className="border rule divide-y rule">
-            {letterTemplates.map((tp) => (
-              <div key={tp.id} className="px-4 py-3 hover:bg-card/60 transition-colors">
+          <div style={{ border: "1px solid var(--line)", borderRadius: 12, overflow: "hidden" }}>
+            {letterTemplates.map((tp, i) => (
+              <div
+                key={tp.id}
+                className="px-4 py-3 transition-colors hover:bg-card/60"
+                style={{ borderTop: i > 0 ? "1px solid var(--line-faint)" : "none" }}
+              >
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
                     <div className="text-sm truncate">{tp.name}</div>
-                    <div className="meta italic font-serif text-xs normal-case tracking-normal">{tp.nameEn}</div>
+                    <div className="meta text-xs normal-case tracking-normal">{tp.nameEn}</div>
                   </div>
-                  <span className="font-mono text-[10px] border rule px-1.5 py-0.5 shrink-0">
+                  <span
+                    style={{
+                      fontFamily: "var(--font-mono)",
+                      fontSize: 10,
+                      border: "1px solid var(--line)",
+                      padding: "2px 6px",
+                      borderRadius: 4,
+                      flexShrink: 0,
+                      color: "var(--ink-mute)",
+                    }}
+                  >
                     {EXT_BADGE[tp.ext]}
                   </span>
                 </div>
                 <div className="flex items-center justify-between mt-2">
                   <span className="meta text-[10px]">{tp.version} · {tp.size}</span>
-                  <button className="text-xs border-b border-rule hover:border-accent hover:text-accent transition-colors">
+                  <button
+                    style={{ fontSize: 12, color: "var(--ink-soft)", background: "none", border: "none", borderBottom: "1px solid var(--line)", cursor: "pointer", padding: "1px 0", transition: "color 120ms, border-color 120ms" }}
+                    onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = "var(--ink)"; (e.currentTarget as HTMLElement).style.borderColor = "var(--ink)"; }}
+                    onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = "var(--ink-soft)"; (e.currentTarget as HTMLElement).style.borderColor = "var(--line)"; }}
+                  >
                     ↓ 下载
                   </button>
                 </div>
               </div>
             ))}
           </div>
-          <div className="mt-4 px-4 py-3 border-l-2 border-rule bg-card/50 text-xs text-ink-soft">
+          <div
+            className="mt-4 px-4 py-3 text-xs text-ink-soft"
+            style={{ borderLeft: "2px solid var(--line)", background: "var(--paper-sunken)", borderRadius: "0 6px 6px 0" }}
+          >
             <span className="meta mr-1">ⓘ</span>
             更多模版请前往
-            <a href="/library" className="text-accent border-b border-rule hover:border-accent ml-1">
+            <a
+              href="/library"
+              style={{ color: "var(--ink)", borderBottom: "1px solid var(--line)", marginLeft: 4, textDecoration: "none", transition: "border-color 120ms" }}
+              onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.borderColor = "var(--ink)")}
+              onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.borderColor = "var(--line)")}
+            >
               资料库
             </a>
           </div>
