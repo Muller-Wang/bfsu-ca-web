@@ -1,47 +1,46 @@
 @import "tailwindcss";
 
 @theme {
-  /* BFSU Design System — Apple/Bauhaus minimalism, indigo + gold palette */
-  --color-paper: #F6F5F1;
-  --color-paper-sunken: #EDECE7;
-  --color-surface: #ffffff;
-  --color-card: #ffffff;
+  /* Brand defaults — 极简黑白 mono palette (active via data-theme="mono") */
+  --color-paper:        #F5F5F7;
+  --color-paper-sunken: #ECECEF;
+  --color-surface:      #FFFFFF;
+  --color-surface-2:    #FAFAFB;
 
-  --color-ink: #1B1A18;
-  --color-ink-soft: #6B6864;
-  --color-ink-mute: #9B9895;
+  --color-ink:          #1D1D1F;
+  --color-ink-soft:     #6E6E73;
+  --color-ink-mute:     #8E8E93;
+  --color-ink-faint:    #B8B8BD;
 
-  --color-line: #E7E4DC;
-  --color-line-strong: #C5C1B8;
-  --color-rule: #E7E4DC;
+  --color-line:         #E4E4E7;
+  --color-line-strong:  #D2D2D7;
+  --color-line-faint:   #EFEFF1;
 
-  /* BFSU brand primaries */
-  --color-accent: #282270;
-  --color-accent-soft: #3B358A;
-  --color-accent-wash: #EDEEFF;
-  --color-gold: #F4B81E;
-  --color-gold-deep: #9B6D00;
+  /* Structural accent — near-black in mono */
+  --color-accent:       #1D1D1F;
+  --color-accent-soft:  #3A3A3C;
+  --color-accent-wash:  #F0F0F2;
 
-  /* Semantic */
-  --color-success: #3D6B45;
+  /* Semantic — kept functional in mono */
+  --color-success:      #3D6B45;
   --color-success-wash: #EAF4EC;
-  --color-warn: #B8731F;
-  --color-warn-wash: #FEF3E2;
-  --color-danger: #8C2A1F;
-  --color-danger-wash: #FDECEB;
+  --color-warn:         #B8731F;
+  --color-warn-wash:    #FEF3E2;
+  --color-danger:       #8C2A1F;
+  --color-danger-wash:  #FDECEB;
 
-  /* Categorical dots — departments & event categories */
-  --color-cat-red: #C0392B;
-  --color-cat-amber: #D68910;
-  --color-cat-green: #27AE60;
-  --color-cat-blue: #2980B9;
+  /* Categorical dots — departments only, not decoration */
+  --color-cat-red:    #C0392B;
+  --color-cat-amber:  #D68910;
+  --color-cat-green:  #27AE60;
+  --color-cat-blue:   #2980B9;
   --color-cat-violet: #8E44AD;
-  --color-cat-slate: #7F8C8D;
+  --color-cat-slate:  #7F8C8D;
 
-  /* Type stack (next/font wires the --font-*-display variables) */
-  --font-serif: var(--font-serif-display), "Source Han Serif SC", "Songti SC", "SimSun", Georgia, serif;
-  --font-sans: var(--font-sans-body), "PingFang SC", "Hiragino Sans GB", -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
-  --font-mono: var(--font-mono-data), "SF Mono", "Menlo", "Consolas", monospace;
+  /* Type */
+  --font-serif: var(--font-serif-display), "Source Han Serif SC", "Songti SC", Georgia, serif;
+  --font-sans:  var(--font-sans-body), "PingFang SC", "Hiragino Sans GB", -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+  --font-mono:  var(--font-mono-data), "SF Mono", "Menlo", "Consolas", monospace;
 
   /* Motion */
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
@@ -50,6 +49,33 @@
 @layer base {
   :root {
     color-scheme: light;
+
+    /* Bare aliases — for inline styles using var(--paper), var(--ink) etc. */
+    --paper:        var(--color-paper);
+    --paper-sunken: var(--color-paper-sunken);
+    --surface:      var(--color-surface);
+    --surface-2:    var(--color-surface-2);
+    --ink:          var(--color-ink);
+    --ink-soft:     var(--color-ink-soft);
+    --ink-mute:     var(--color-ink-mute);
+    --ink-faint:    var(--color-ink-faint);
+    --line:         var(--color-line);
+    --line-strong:  var(--color-line-strong);
+    --line-faint:   var(--color-line-faint);
+    --on-dark:      #F5F5F7;
+    --on-dark-soft: #A1A1A6;
+    --bfsu-indigo:  var(--color-accent);
+
+    /* Shadows */
+    --shadow-xs: 0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.05);
+    --shadow-sm: 0 2px 6px rgba(0,0,0,0.08);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.10);
+    --shadow-lg: 0 8px 32px rgba(0,0,0,0.12);
+
+    /* Motion durations */
+    --dur-fast:   120ms;
+    --dur-base:   200ms;
+    --dur-slow:   360ms;
   }
 
   html,
@@ -57,47 +83,68 @@
     background: var(--color-paper);
     color: var(--color-ink);
     font-family: var(--font-sans);
-    font-feature-settings: "ss01", "cv01", "cv11";
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
   ::selection {
-    background: var(--color-accent);
+    background: var(--color-ink);
     color: #fff;
   }
 }
 
+/* ── Mono theme override (activated via data-theme="mono" on <html>) ── */
+[data-theme="mono"] {
+  --color-paper:        #F5F5F7;
+  --color-paper-sunken: #ECECEF;
+  --color-surface:      #FFFFFF;
+  --color-ink:          #1D1D1F;
+  --color-ink-soft:     #6E6E73;
+  --color-ink-mute:     #8E8E93;
+  --color-ink-faint:    #B8B8BD;
+  --color-line:         #E4E4E7;
+  --color-line-strong:  #D2D2D7;
+  --color-line-faint:   #EFEFF1;
+  --color-accent:       #1D1D1F;
+  --color-accent-soft:  #3A3A3C;
+  --color-accent-wash:  #F0F0F2;
+
+  --paper:        #F5F5F7;
+  --paper-sunken: #ECECEF;
+  --surface:      #FFFFFF;
+  --ink:          #1D1D1F;
+  --ink-soft:     #6E6E73;
+  --ink-mute:     #8E8E93;
+  --ink-faint:    #B8B8BD;
+  --line:         #E4E4E7;
+  --line-faint:   #EFEFF1;
+  --bfsu-indigo:  #1D1D1F;
+  --on-dark:      #F5F5F7;
+  --on-dark-soft: #A1A1A6;
+}
+
 @layer utilities {
-  .font-serif {
-    font-family: var(--font-serif);
-  }
-  .font-sans {
-    font-family: var(--font-sans);
-  }
-  .font-mono {
-    font-family: var(--font-mono);
-  }
+  .font-serif { font-family: var(--font-serif); }
+  .font-sans  { font-family: var(--font-sans); }
+  .font-mono  { font-family: var(--font-mono); }
 
   .small-caps {
     font-variant-caps: all-small-caps;
     letter-spacing: 0.12em;
   }
 
-  /* Hairline divider */
-  .rule {
-    border-color: var(--color-rule);
-  }
+  .rule   { border-color: var(--color-line); }
+  .rule-faint { border-color: var(--color-line-faint); }
 
-  /* Editorial display heading */
+  /* Tight sans display — mono aesthetic */
   .display {
-    font-family: var(--font-serif);
-    font-weight: 400;
-    letter-spacing: -0.02em;
-    line-height: 1.05;
+    font-family: var(--font-sans);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1.04;
   }
 
-  /* Mono metadata strip */
+  /* Mono metadata */
   .meta {
     font-family: var(--font-mono);
     font-size: 0.6875rem;
@@ -106,7 +153,6 @@
     color: var(--color-ink-mute);
   }
 
-  /* Category/status dot */
   .dot {
     display: inline-block;
     width: 0.5rem;
@@ -116,34 +162,18 @@
     vertical-align: 1px;
   }
 
-  /* Bauhaus structural top-border for columnar blocks */
-  .col-rule {
-    border-top: 2px solid var(--color-ink);
-    padding-top: 1.25rem;
-  }
-}
-
-/* Page-load reveal */
-@keyframes rise {
-  from {
+  /* Scroll-reveal — only used below the fold */
+  .reveal {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(26px);
+    transition: opacity 0.9s var(--ease-out), transform 0.9s var(--ease-out);
   }
-  to {
+  .reveal.visible {
     opacity: 1;
-    transform: translateY(0);
+    transform: none;
   }
 }
-
-.rise {
-  animation: rise 0.5s var(--ease-out) both;
-}
-.rise-1 { animation-delay: 60ms; }
-.rise-2 { animation-delay: 120ms; }
-.rise-3 { animation-delay: 200ms; }
-.rise-4 { animation-delay: 280ms; }
-.rise-5 { animation-delay: 360ms; }
 
 @media (prefers-reduced-motion: reduce) {
-  .rise { animation-duration: 1ms; }
+  .reveal { transition-duration: 1ms !important; }
 }

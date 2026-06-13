@@ -1,244 +1,367 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
-
-function BauhausMark({ size = 320 }: { size?: number }) {
-  const u = size / 4;
-  return (
-    <div style={{ position: "relative", width: size, height: size }} aria-hidden>
-      <div style={{ position: "absolute", left: 0, top: u, width: u * 2, height: u * 2, background: "#282270" }} />
-      <div style={{ position: "absolute", left: u * 1.5, top: 0, width: u * 2, height: u * 2, borderRadius: 999, background: "#F4B81E" }} />
-      <div style={{ position: "absolute", right: 0, bottom: u * 0.5, width: u * 2, height: u * 2, background: "#C0392B", borderTopLeftRadius: u * 2 }} />
-      <div style={{ position: "absolute", left: u * 0.5, bottom: u * 0.25, width: u * 3, height: 2, background: "#1B1A18" }} />
-      <div style={{ position: "absolute", right: u * 0.4, top: u * 0.2, width: u * 0.9, height: u * 0.9, borderRadius: 999, border: "2px solid #1B1A18" }} />
-    </div>
-  );
-}
+import { ParticleCanvas } from "@/components/ui/ParticleCanvas";
 
 const STATS = [
   { num: "30+", label: "场跨语种活动 / 年" },
-  { num: "5000+", label: "覆盖全校人次" },
+  { num: "5,000+", label: "覆盖全校人次" },
   { num: "6", label: "职能部门" },
   { num: "2014", label: "成立年份" },
 ];
 
-const WORK_ITEMS = [
+const BENTO_SMALL = [
   {
-    no: "01",
-    zh: "活动策划",
-    en: "Events",
-    desc: "英语角、读书会、文化沙龙、节日庆典——每年 30+ 场跨语种活动，覆盖全校 5000+ 人次。",
-  },
-  {
-    no: "02",
     zh: "外联拓展",
-    en: "Outreach",
-    desc: "连接兄弟社团、企业赞助、基金会与政府单位，为创意寻找资源，让好想法落地。",
+    body: "兄弟社团、企业赞助、基金会与政府单位——为创意寻找资源，让好想法落地。",
   },
   {
-    no: "03",
     zh: "内容创作",
-    en: "Content",
-    desc: "公众号运营、多语种内容创作、创意写作——以内容为媒介，传递跨文化视野。",
+    body: "公众号、多语种内容、创意写作——以内容传递跨文化视野。",
   },
 ];
 
-const DEPTS = [
-  { zh: "秘书处", en: "Secretariat", desc: "学时管理、行政统筹、成员事务", dot: "var(--color-cat-green)" },
-  { zh: "外联部", en: "Outreach Dept.", desc: "企业赞助、校际合作、资源对接", dot: "var(--color-cat-blue)" },
-  { zh: "学术部", en: "Academic Dept.", desc: "读书会、课程设计、学术内容", dot: "var(--color-cat-violet)" },
-  { zh: "宣传部", en: "Media Dept.", desc: "公众号、视觉设计、品牌传播", dot: "var(--color-cat-red)" },
-];
+const DEPTS = ["秘书处", "外联部", "学术部", "宣传部", "日语部", "德语部"];
+
+/* Bento card shell */
+function Card({ dark = false, children, style }: { dark?: boolean; children: React.ReactNode; style?: React.CSSProperties }) {
+  return (
+    <div
+      style={{
+        borderRadius: 28,
+        padding: "42px 44px",
+        height: "100%",
+        boxSizing: "border-box",
+        background: dark ? "var(--ink)" : "var(--surface)",
+        color: dark ? "var(--on-dark)" : "var(--ink)",
+        position: "relative",
+        overflow: "hidden",
+        boxShadow: "var(--shadow-xs)",
+        ...style,
+      }}
+    >
+      {children}
+    </div>
+  );
+}
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-paper">
-      {/* Nav */}
+    <div style={{ fontFamily: "var(--font-sans)" }}>
+      {/* ── Nav ── */}
       <header
-        className="sticky top-0 z-30 border-b rule"
-        style={{ background: "color-mix(in srgb, var(--color-paper) 86%, transparent)", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)" } as React.CSSProperties}
+        style={{
+          position: "sticky",
+          top: 0,
+          zIndex: 30,
+          background: "color-mix(in srgb, var(--surface) 75%, transparent)",
+          backdropFilter: "blur(20px) saturate(1.8)",
+          WebkitBackdropFilter: "blur(20px) saturate(1.8)",
+          borderBottom: "1px solid var(--line-faint)",
+        }}
       >
-        <div className="max-w-6xl mx-auto px-8 h-[68px] flex items-center justify-between">
-          <a href="#top" className="flex items-baseline gap-3">
-            <span className="display text-2xl">
-              <span style={{ color: "var(--color-accent)" }}>创</span>协
-            </span>
-            <span className="meta hidden sm:inline">BFSU · Creative Association</span>
+        <div style={{ maxWidth: 1024, margin: "0 auto", padding: "0 22px", height: 52, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <a href="#top" style={{ fontSize: 17, fontWeight: 600, letterSpacing: "-0.02em", color: "var(--ink)", textDecoration: "none" }}>
+            创协
           </a>
-          <nav className="flex items-center gap-7">
-            {[["工作", "#work"], ["部门", "#depts"], ["关于", "#about"]].map(([zh, href]) => (
-              <a key={href} href={href} className="text-sm text-ink-soft hover:text-ink transition-colors hidden md:inline">
+          <nav style={{ display: "flex", alignItems: "center", gap: 26 }}>
+            {[["工作", "#work"], ["部门", "#depts"], ["加入", "#join"]].map(([zh, href]) => (
+              <a
+                key={href}
+                href={href}
+                style={{ fontSize: 13, color: "var(--ink-soft)", textDecoration: "none", transition: "color 120ms var(--ease-out)" }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = "var(--ink)")}
+                onMouseLeave={(e) => (e.currentTarget.style.color = "var(--ink-soft)")}
+              >
                 {zh}
               </a>
             ))}
             <Link
               href="/login"
-              className="flex items-center gap-2 px-4 py-2 text-sm text-card transition-colors rounded-[10px]"
-              style={{ background: "var(--color-accent)" }}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                height: "1.9rem",
+                padding: "0 1rem",
+                fontSize: 13,
+                fontWeight: 500,
+                color: "#fff",
+                background: "var(--ink)",
+                borderRadius: 999,
+                textDecoration: "none",
+                transition: "opacity 120ms",
+              }}
+              onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.opacity = "0.8")}
+              onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.opacity = "1")}
             >
-              系统登录
-              <span aria-hidden className="text-xs opacity-70">→</span>
+              登录
             </Link>
           </nav>
         </div>
       </header>
 
-      {/* Hero */}
-      <section id="top" className="max-w-6xl mx-auto px-8 pt-20 pb-16">
-        <div className="grid grid-cols-1 md:grid-cols-[1.35fr_1fr] gap-12 items-center">
-          <div className="rise rise-1">
-            <div className="meta text-xs mb-6">Est. 2014 · Beijing Foreign Studies University</div>
-            <h1 className="display text-[clamp(3.5rem,7vw,5rem)] leading-[1.0]">
-              北外创协
-              <br />
-              <span className="italic" style={{ color: "var(--color-accent)" }}>Creative</span>
-              <br />
-              Association
-            </h1>
-            <p className="mt-7 text-[17px] leading-[1.75] text-ink-soft max-w-[460px]">
-              北京外国语大学创意协会。以跨文化交流为底色，以内容创意为驱动——策划活动、联结资源、推动创意落地。
+      {/* ── Hero ── */}
+      <section
+        id="top"
+        style={{ position: "relative", textAlign: "center", padding: "132px 24px 122px", background: "var(--paper)" }}
+      >
+        <ParticleCanvas />
+        <div style={{ position: "relative", zIndex: 1 }}>
+          <div style={{ fontSize: 15, fontWeight: 500, color: "var(--ink-soft)", marginBottom: 20 }}>
+            北京外国语大学创意协会 · Est. 2014
+          </div>
+          <h1
+            style={{
+              fontSize: "clamp(56px, 9vw, 90px)",
+              fontWeight: 600,
+              letterSpacing: "-0.035em",
+              lineHeight: 1.04,
+              color: "var(--ink)",
+              margin: 0,
+            }}
+          >
+            创意，在北外。
+          </h1>
+          <p
+            style={{
+              fontSize: "clamp(17px, 2vw, 24px)",
+              lineHeight: 1.5,
+              letterSpacing: "-0.01em",
+              color: "var(--ink-soft)",
+              maxWidth: 600,
+              margin: "26px auto 0",
+            }}
+          >
+            以跨文化交流为底色，以内容创意为驱动。
+            <br />
+            策划活动、联结资源、推动创意落地。
+          </p>
+          <div style={{ marginTop: 42, display: "flex", justifyContent: "center", alignItems: "center", gap: 24 }}>
+            <Link
+              href="/login"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                height: "2.8rem",
+                padding: "0 1.8rem",
+                fontSize: 17,
+                fontWeight: 500,
+                color: "#fff",
+                background: "var(--ink)",
+                borderRadius: 999,
+                textDecoration: "none",
+                transition: "opacity 150ms",
+              }}
+            >
+              进入系统
+            </Link>
+            <a
+              href="#work"
+              style={{ fontSize: 17, color: "var(--ink-soft)", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 4 }}
+            >
+              了解更多 ↓
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Stats ── */}
+      <section style={{ background: "var(--surface)", padding: "92px 24px" }}>
+        <div
+          style={{
+            maxWidth: 1024,
+            margin: "0 auto",
+            display: "grid",
+            gridTemplateColumns: "repeat(4, 1fr)",
+            gap: 24,
+            textAlign: "center",
+          }}
+        >
+          {STATS.map(({ num, label }, i) => (
+            <div key={i}>
+              <div
+                style={{
+                  fontSize: 56,
+                  fontWeight: 600,
+                  letterSpacing: "-0.03em",
+                  lineHeight: 1,
+                  color: "var(--ink)",
+                  fontFeatureSettings: '"tnum"',
+                }}
+              >
+                {num}
+              </div>
+              <div style={{ marginTop: 12, fontSize: 14, color: "var(--ink-soft)" }}>{label}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── Bento ── */}
+      <section id="work" style={{ background: "var(--paper)", padding: "112px 24px" }}>
+        <div style={{ maxWidth: 1024, margin: "0 auto" }}>
+          <div style={{ textAlign: "center", marginBottom: 56 }}>
+            <h2
+              style={{
+                fontSize: "clamp(36px, 5vw, 52px)",
+                fontWeight: 600,
+                letterSpacing: "-0.03em",
+                color: "var(--ink)",
+                margin: 0,
+              }}
+            >
+              我们的工作。
+            </h2>
+            <p style={{ fontSize: 19, color: "var(--ink-soft)", margin: "16px auto 0", maxWidth: 520 }}>
+              每年 30+ 场活动背后，是三件持续在做的事。
             </p>
-            <div className="mt-9 flex items-center gap-5">
-              <Link
-                href="/login"
-                className="flex items-center gap-2 px-7 py-3.5 text-sm font-medium text-card rounded-[10px] transition-colors"
-                style={{ background: "var(--color-gold)", color: "#1B1A18" }}
-              >
-                进入系统
-                <span aria-hidden className="text-xs opacity-70">→</span>
-              </Link>
-              <span className="meta text-[11px]" style={{ color: "var(--color-ink-mute)" }}>
-                学号登录 · 仅内部成员
-              </span>
-            </div>
           </div>
-          <div className="rise rise-3 flex justify-center">
-            <BauhausMark size={300} />
-          </div>
-        </div>
-      </section>
 
-      {/* Stats strip */}
-      <section className="bg-surface border-y rule">
-        <div className="max-w-6xl mx-auto px-8 py-8 grid grid-cols-2 md:grid-cols-4">
-          {STATS.map((s, i) => (
-            <div key={s.num} className={`px-6 ${i > 0 ? "border-l rule" : ""}`}>
-              <div
-                className="display text-[44px]"
-                style={{ color: "var(--color-accent)" }}
-              >
-                {s.num}
-              </div>
-              <div className="mt-2 text-sm text-ink-soft">{s.label}</div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 18 }}>
+            {/* Large card — 活动策划 */}
+            <div style={{ gridColumn: "span 4" }}>
+              <Card style={{ minHeight: 250 }}>
+                <h3 style={{ fontSize: 30, fontWeight: 600, letterSpacing: "-0.02em", margin: "0 0 12px", color: "var(--ink)" }}>
+                  活动策划
+                </h3>
+                <p style={{ fontSize: 16, lineHeight: 1.65, color: "var(--ink-soft)", margin: 0, maxWidth: 380 }}>
+                  英语角、读书会、文化沙龙、节日庆典——每年 30+ 场跨语种活动，覆盖全校 5000+ 人次。
+                </p>
+                <div
+                  aria-hidden
+                  style={{
+                    position: "absolute",
+                    right: 18,
+                    bottom: -34,
+                    fontSize: 168,
+                    fontWeight: 700,
+                    letterSpacing: "-0.05em",
+                    lineHeight: 1,
+                    color: "var(--paper-sunken)",
+                    userSelect: "none",
+                  }}
+                >
+                  30+
+                </div>
+              </Card>
             </div>
-          ))}
-        </div>
-      </section>
 
-      {/* What we do */}
-      <section id="work" className="max-w-6xl mx-auto px-8 py-20">
-        <div className="meta text-xs mb-2" style={{ color: "var(--color-ink-mute)" }}>What we do</div>
-        <h2 className="display text-4xl text-ink mb-10">我们的工作</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {WORK_ITEMS.map((item) => (
-            <div key={item.no} className="col-rule">
-              <div
-                className="font-mono text-[13px] mb-4"
-                style={{ color: "var(--color-gold-deep)" }}
-              >
-                {item.no}
-              </div>
-              <h3 className="text-[22px] font-semibold tracking-tight text-ink mb-1">{item.zh}</h3>
-              <div className="meta mb-3">{item.en}</div>
-              <p className="text-[15px] leading-[1.7] text-ink-soft">{item.desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Departments */}
-      <section id="depts" className="bg-surface border-y rule">
-        <div className="max-w-6xl mx-auto px-8 py-20">
-          <div className="meta text-xs mb-2" style={{ color: "var(--color-ink-mute)" }}>Departments · 部门设置</div>
-          <h2 className="display text-4xl text-ink mb-10">六个部门，一种语言：创意</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {DEPTS.map((d) => (
-              <div
-                key={d.en}
-                className="bg-paper border rule rounded-2xl p-5 hover:-translate-y-0.5 transition-transform duration-200"
-              >
-                <span
-                  className="dot mb-5 block"
-                  style={{ color: d.dot, width: 12, height: 12 }}
-                />
-                <h3 className="text-[18px] font-semibold text-ink mb-0.5">{d.zh}</h3>
-                <div className="meta mb-3">{d.en}</div>
-                <p className="text-[13px] leading-[1.65] text-ink-soft">{d.desc}</p>
+            {/* Small cards */}
+            {BENTO_SMALL.map((item, i) => (
+              <div key={i} style={{ gridColumn: i === 0 ? "span 2" : "span 2" }}>
+                <Card style={{ minHeight: 250 }}>
+                  <h3 style={{ fontSize: 24, fontWeight: 600, letterSpacing: "-0.02em", margin: "0 0 10px", color: "var(--ink)" }}>
+                    {item.zh}
+                  </h3>
+                  <p style={{ fontSize: 15, lineHeight: 1.65, color: "var(--ink-soft)", margin: 0 }}>{item.body}</p>
+                </Card>
               </div>
             ))}
+
+            {/* Dark card — departments */}
+            <div id="depts" style={{ gridColumn: "span 4" }}>
+              <Card dark style={{ minHeight: 230, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+                <h3 style={{ fontSize: 24, fontWeight: 600, letterSpacing: "-0.02em", margin: 0, color: "var(--on-dark)" }}>
+                  六个部门，一种语言：创意。
+                </h3>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginTop: 26 }}>
+                  {DEPTS.map((d) => (
+                    <span
+                      key={d}
+                      style={{
+                        fontSize: 14,
+                        color: "var(--on-dark-soft)",
+                        border: "1px solid rgba(255,255,255,0.15)",
+                        borderRadius: 999,
+                        padding: "8px 18px",
+                        transition: "color 120ms, border-color 120ms",
+                        cursor: "default",
+                      }}
+                      onMouseEnter={(e) => {
+                        (e.currentTarget as HTMLElement).style.color = "#fff";
+                        (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.5)";
+                      }}
+                      onMouseLeave={(e) => {
+                        (e.currentTarget as HTMLElement).style.color = "var(--on-dark-soft)";
+                        (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.15)";
+                      }}
+                    >
+                      {d}
+                    </span>
+                  ))}
+                </div>
+              </Card>
+            </div>
           </div>
-          <p className="mt-5 text-sm text-ink-soft" style={{ fontFamily: "var(--font-mono)", fontSize: 13 }}>
-            另设有日语部、德语部，专注于日本与德语国家文化活动的策划与执行。
-          </p>
         </div>
       </section>
 
-      {/* CTA — full-bleed indigo */}
-      <section id="about" style={{ background: "var(--color-accent)" }}>
-        <div className="max-w-6xl mx-auto px-8 py-24 text-center">
-          <div
-            className="meta text-xs mb-4"
-            style={{ color: "rgba(255,255,255,0.5)" }}
-          >
-            Join the system · 内部入口
-          </div>
-          <h2
-            className="display text-[clamp(2.5rem,5vw,3.5rem)] max-w-xl mx-auto leading-[1.1]"
-            style={{ color: "#fff" }}
-          >
-            成员登录系统
-          </h2>
-          <p
-            className="mt-5 text-base leading-[1.75] max-w-[480px] mx-auto"
-            style={{ color: "rgba(255,255,255,0.65)" }}
-          >
-            使用学号与密码登录内网，查看任务、管理活动、下载模板、跟踪外联进度。
-          </p>
+      {/* ── CTA ── */}
+      <section id="join" style={{ background: "var(--surface)", padding: "118px 24px", textAlign: "center" }}>
+        <h2
+          style={{
+            fontSize: "clamp(36px, 5vw, 52px)",
+            fontWeight: 600,
+            letterSpacing: "-0.03em",
+            color: "var(--ink)",
+            margin: 0,
+          }}
+        >
+          成员登录系统。
+        </h2>
+        <p style={{ fontSize: 19, color: "var(--ink-soft)", margin: "16px auto 0", maxWidth: 460 }}>
+          任务、活动、资料库与学时——一处管理创协所有内部事务。
+        </p>
+        <div style={{ marginTop: 38 }}>
           <Link
             href="/login"
-            className="inline-flex items-center gap-2 mt-8 px-7 py-3.5 text-sm font-medium rounded-[10px] transition-opacity hover:opacity-90"
-            style={{ background: "var(--color-gold)", color: "#1B1A18" }}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              height: "2.8rem",
+              padding: "0 1.9rem",
+              fontSize: 17,
+              fontWeight: 500,
+              color: "#fff",
+              background: "var(--ink)",
+              borderRadius: 999,
+              textDecoration: "none",
+            }}
           >
             登录系统
-            <span aria-hidden className="text-xs opacity-70">→</span>
           </Link>
         </div>
+        <div style={{ marginTop: 18, fontSize: 13, color: "var(--ink-mute)" }}>学号登录 · 仅内部成员</div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-paper border-t rule">
-        <div className="max-w-6xl mx-auto px-8 py-8 flex items-end justify-between gap-6 flex-wrap">
-          <div className="flex items-center gap-4">
+      {/* ── Footer ── */}
+      <footer style={{ background: "var(--paper)", borderTop: "1px solid var(--line-faint)" }}>
+        <div
+          style={{
+            maxWidth: 1024,
+            margin: "0 auto",
+            padding: "28px 22px",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <Image
               src="/bfsu-badge.png"
               alt="BFSU"
-              width={48}
-              height={48}
-              className="object-contain"
+              width={32}
+              height={32}
+              style={{ objectFit: "contain", opacity: 0.5 }}
             />
-            <div
-              className="font-mono leading-[1.8] tracking-wide uppercase"
-              style={{ fontSize: 11, color: "var(--color-ink-mute)" }}
-            >
-              BFSU Creative Association
-              <br />
-              Est. 2014 · Beijing Foreign Studies University
-              <br />
-              Internal System v0.1
-            </div>
+            <span style={{ fontSize: 12, color: "var(--ink-mute)" }}>
+              北外创协 · BFSU Creative Association · Est. 2014
+            </span>
           </div>
-          <Link href="/login" className="text-sm text-ink-soft hover:text-ink transition-colors">
-            系统登录 →
-          </Link>
+          <a href="#top" style={{ fontSize: 12, color: "var(--ink-soft)", textDecoration: "none" }}>
+            返回顶部
+          </a>
         </div>
       </footer>
     </div>

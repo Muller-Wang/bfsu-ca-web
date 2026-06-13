@@ -6,7 +6,6 @@ import Image from "next/image";
 import { USERS } from "@/lib/mock/users";
 import { setLocal } from "@/lib/auth";
 import { ROLE_LABEL } from "@/lib/types";
-import { BauhausMark } from "@/components/ui/BauhausMark";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -34,116 +33,300 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex">
-      {/* Left panel */}
+    <div style={{ minHeight: "100vh", display: "flex" }}>
+      {/* Left — ink panel */}
       <aside
-        className="hidden md:flex md:w-1/2 flex-col justify-between px-16 py-16 relative overflow-hidden"
-        style={{ background: "var(--color-accent)" }}
+        style={{
+          display: "none",
+          width: "50%",
+          flexDirection: "column",
+          justifyContent: "space-between",
+          padding: "52px 56px",
+          background: "var(--ink)",
+          color: "var(--on-dark)",
+          position: "relative",
+          overflow: "hidden",
+        }}
+        className="md:flex"
       >
-        <div className="relative z-10">
+        <div>
           <div
-            className="font-mono text-[11px] tracking-[0.14em] uppercase mb-10"
-            style={{ color: "rgba(255,255,255,0.45)" }}
+            style={{
+              fontFamily: "var(--font-mono)",
+              fontSize: 11,
+              letterSpacing: "0.14em",
+              textTransform: "uppercase",
+              color: "var(--on-dark-soft)",
+              marginBottom: 56,
+            }}
           >
             Beijing Foreign Studies University
           </div>
-          <h1 className="display text-[clamp(3.5rem,5.5vw,5rem)] leading-[1.0]" style={{ color: "#fff" }}>
-            北外创协
+          <h1
+            style={{
+              fontSize: "clamp(40px, 5vw, 68px)",
+              fontWeight: 600,
+              letterSpacing: "-0.03em",
+              lineHeight: 1.04,
+              color: "#fff",
+              margin: 0,
+            }}
+          >
+            创意，
             <br />
-            <span className="italic" style={{ color: "var(--color-gold)" }}>Creative</span>
-            <br />
-            Association
+            在北外。
           </h1>
-          <p className="mt-8 text-base leading-relaxed max-w-sm" style={{ color: "rgba(255,255,255,0.6)" }}>
-            北外创协的内网与管理系统——用于策划、申报、归档、日程安排。
+          <p
+            style={{
+              marginTop: 24,
+              fontSize: 16,
+              lineHeight: 1.7,
+              color: "var(--on-dark-soft)",
+              maxWidth: 340,
+            }}
+          >
+            内网与管理系统——策划、申报、归档、日程安排，一处搞定。
           </p>
         </div>
 
-        <div className="relative z-10 flex items-end justify-between">
-          <div className="flex items-center gap-3">
-            <Image src="/bfsu-badge.png" alt="BFSU" width={40} height={40} className="object-contain opacity-80" />
-            <div className="font-mono text-[10px] tracking-widest uppercase leading-loose" style={{ color: "rgba(255,255,255,0.35)" }}>
-              Est. 2014
-              <br />
-              Internal
-            </div>
-          </div>
-          <div className="display text-7xl select-none" style={{ color: "rgba(255,255,255,0.08)" }}>
-            № 01
+        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+          <Image
+            src="/bfsu-badge.png"
+            alt="BFSU"
+            width={36}
+            height={36}
+            style={{ objectFit: "contain", filter: "brightness(0) invert(1)", opacity: 0.45 }}
+          />
+          <div
+            style={{
+              fontFamily: "var(--font-mono)",
+              fontSize: 10,
+              letterSpacing: "0.1em",
+              textTransform: "uppercase",
+              lineHeight: 1.8,
+              color: "rgba(255,255,255,0.25)",
+            }}
+          >
+            BFSU Creative Association
+            <br />
+            Est. 2014 · Internal System
           </div>
         </div>
 
-        {/* Bauhaus decoration — bottom-right corner */}
-        <div className="absolute -bottom-16 -right-16 opacity-15" aria-hidden>
-          <BauhausMark size={240} invertColors />
+        {/* Decorative watermark */}
+        <div
+          aria-hidden
+          style={{
+            position: "absolute",
+            right: -40,
+            bottom: -60,
+            fontSize: 220,
+            fontWeight: 700,
+            letterSpacing: "-0.06em",
+            lineHeight: 1,
+            color: "rgba(255,255,255,0.04)",
+            userSelect: "none",
+            fontFamily: "var(--font-sans)",
+          }}
+        >
+          创
         </div>
       </aside>
 
-      {/* Right panel — login form */}
-      <main className="flex-1 flex items-center justify-center px-10 py-12 bg-paper">
-        <div className="w-full max-w-md rise rise-1">
-          <div className="meta text-xs mb-4">Sign in · 登录</div>
-          <h2 className="display text-5xl text-ink mb-2 leading-[1.05]">欢迎回来</h2>
-          <p className="text-base text-ink-soft mb-10">使用学号和密码登录系统</p>
+      {/* Right — form */}
+      <main
+        style={{
+          flex: 1,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "48px 40px",
+          background: "var(--paper)",
+        }}
+      >
+        <div style={{ width: "100%", maxWidth: 400 }}>
+          <div
+            style={{
+              fontFamily: "var(--font-mono)",
+              fontSize: 11,
+              letterSpacing: "0.12em",
+              textTransform: "uppercase",
+              color: "var(--ink-mute)",
+              marginBottom: 16,
+            }}
+          >
+            Sign in · 登录
+          </div>
+          <h2
+            style={{
+              fontSize: 40,
+              fontWeight: 600,
+              letterSpacing: "-0.03em",
+              color: "var(--ink)",
+              margin: "0 0 8px",
+            }}
+          >
+            欢迎回来。
+          </h2>
+          <p style={{ fontSize: 15, color: "var(--ink-soft)", marginBottom: 40 }}>使用学号和密码登录系统</p>
 
-          <form onSubmit={handleLogin} className="space-y-7">
+          <form onSubmit={handleLogin} style={{ display: "flex", flexDirection: "column", gap: 28 }}>
             <div>
-              <label className="meta text-xs block mb-3">学号 / Student ID</label>
+              <label
+                style={{
+                  display: "block",
+                  fontFamily: "var(--font-mono)",
+                  fontSize: 11,
+                  letterSpacing: "0.1em",
+                  textTransform: "uppercase",
+                  color: "var(--ink-mute)",
+                  marginBottom: 10,
+                }}
+              >
+                学号 / Student ID
+              </label>
               <input
                 value={studentId}
                 onChange={(e) => setStudentId(e.target.value)}
-                className="w-full bg-transparent border-b rule pb-3 outline-none font-mono text-[17px] transition-colors"
-                style={{ borderColor: "var(--color-line)", fontFamily: "var(--font-mono)" }}
-                onFocus={(e) => (e.currentTarget.style.borderColor = "var(--color-accent)")}
-                onBlur={(e) => (e.currentTarget.style.borderColor = "var(--color-line)")}
+                style={{
+                  width: "100%",
+                  background: "transparent",
+                  borderBottom: "1px solid var(--line)",
+                  paddingBottom: 10,
+                  outline: "none",
+                  fontFamily: "var(--font-mono)",
+                  fontSize: 17,
+                  color: "var(--ink)",
+                  transition: "border-color 150ms",
+                  boxSizing: "border-box",
+                }}
                 placeholder="23110301001"
                 autoComplete="username"
+                onFocus={(e) => (e.currentTarget.style.borderColor = "var(--ink)")}
+                onBlur={(e) => (e.currentTarget.style.borderColor = "var(--line)")}
               />
             </div>
 
             <div>
-              <label className="meta text-xs block mb-3">密码 / Password</label>
+              <label
+                style={{
+                  display: "block",
+                  fontFamily: "var(--font-mono)",
+                  fontSize: 11,
+                  letterSpacing: "0.1em",
+                  textTransform: "uppercase",
+                  color: "var(--ink-mute)",
+                  marginBottom: 10,
+                }}
+              >
+                密码 / Password
+              </label>
               <input
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 type="password"
-                className="w-full bg-transparent border-b pb-3 outline-none font-mono text-[17px] transition-colors"
-                style={{ borderColor: "var(--color-line)", fontFamily: "var(--font-mono)" }}
-                onFocus={(e) => (e.currentTarget.style.borderColor = "var(--color-accent)")}
-                onBlur={(e) => (e.currentTarget.style.borderColor = "var(--color-line)")}
+                style={{
+                  width: "100%",
+                  background: "transparent",
+                  borderBottom: "1px solid var(--line)",
+                  paddingBottom: 10,
+                  outline: "none",
+                  fontFamily: "var(--font-mono)",
+                  fontSize: 17,
+                  color: "var(--ink)",
+                  transition: "border-color 150ms",
+                  boxSizing: "border-box",
+                }}
                 placeholder="••••••••"
                 autoComplete="current-password"
+                onFocus={(e) => (e.currentTarget.style.borderColor = "var(--ink)")}
+                onBlur={(e) => (e.currentTarget.style.borderColor = "var(--line)")}
               />
             </div>
 
-            {error && <div className="text-sm" style={{ color: "var(--color-danger)" }}>{error}</div>}
+            {error && (
+              <div style={{ fontSize: 14, color: "var(--color-danger)" }}>{error}</div>
+            )}
 
             <button
               type="submit"
-              className="w-full mt-4 py-4 text-base tracking-[0.25em] text-white rounded-[10px] transition-opacity hover:opacity-90 active:scale-[0.99]"
-              style={{ background: "var(--color-accent)" }}
+              style={{
+                marginTop: 8,
+                height: "2.8rem",
+                padding: "0 1.5rem",
+                fontSize: 15,
+                fontWeight: 500,
+                color: "#fff",
+                background: "var(--ink)",
+                border: "none",
+                borderRadius: 999,
+                cursor: "pointer",
+                letterSpacing: "0.04em",
+                transition: "opacity 150ms",
+              }}
+              onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.opacity = "0.8")}
+              onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.opacity = "1")}
             >
               登 录
             </button>
           </form>
 
-          <div className="mt-10 pt-6 border-t rule">
-            <div className="meta text-xs mb-4">Demo · 快速切换角色</div>
-            <div className="grid grid-cols-1 gap-1.5">
+          <div
+            style={{
+              marginTop: 40,
+              paddingTop: 28,
+              borderTop: "1px solid var(--line)",
+            }}
+          >
+            <div
+              style={{
+                fontFamily: "var(--font-mono)",
+                fontSize: 11,
+                letterSpacing: "0.1em",
+                textTransform: "uppercase",
+                color: "var(--ink-mute)",
+                marginBottom: 14,
+              }}
+            >
+              Demo · 快速切换角色
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
               {USERS.slice(0, 5).map((u) => (
                 <button
                   key={u.id}
                   onClick={() => quickLogin(u.id)}
-                  className="text-left px-4 py-2.5 border rule bg-surface rounded-[8px] transition-colors flex items-center justify-between text-sm group"
-                  style={{ transition: "border-color 0.15s" }}
-                  onMouseEnter={(e) => (e.currentTarget.style.borderColor = "var(--color-accent)")}
-                  onMouseLeave={(e) => (e.currentTarget.style.borderColor = "var(--color-line)")}
+                  style={{
+                    textAlign: "left",
+                    padding: "10px 16px",
+                    background: "var(--surface)",
+                    border: "1px solid var(--line)",
+                    borderRadius: 10,
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    fontSize: 14,
+                    color: "var(--ink)",
+                    transition: "border-color 120ms",
+                  }}
+                  onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.borderColor = "var(--ink)")}
+                  onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.borderColor = "var(--line)")}
                 >
                   <span>
                     {u.name}
-                    <span className="text-ink-mute ml-2 text-xs">{u.department}</span>
+                    <span style={{ color: "var(--ink-mute)", marginLeft: 8, fontSize: 12 }}>{u.department}</span>
                   </span>
-                  <span className="meta">{ROLE_LABEL[u.role]}</span>
+                  <span
+                    style={{
+                      fontFamily: "var(--font-mono)",
+                      fontSize: 10,
+                      letterSpacing: "0.08em",
+                      textTransform: "uppercase",
+                      color: "var(--ink-mute)",
+                    }}
+                  >
+                    {ROLE_LABEL[u.role]}
+                  </span>
                 </button>
               ))}
             </div>

@@ -27,74 +27,82 @@ export function SideNav() {
   const isActive = (href: string) =>
     pathname === href || (href !== "/dashboard" && pathname.startsWith(href));
 
+  const navItem = (href: string, label: string, zh: string) => {
+    const active = isActive(href);
+    return (
+      <Link
+        key={href}
+        href={href}
+        style={{
+          display: "flex",
+          alignItems: "baseline",
+          justifyContent: "space-between",
+          padding: "8px 12px",
+          borderRadius: 8,
+          textDecoration: "none",
+          background: active ? "var(--paper-sunken)" : "transparent",
+          color: active ? "var(--ink)" : "var(--ink-soft)",
+          fontWeight: active ? 500 : 400,
+          transition: "background 120ms, color 120ms",
+        }}
+        onMouseEnter={(e) => {
+          if (!active) (e.currentTarget as HTMLElement).style.background = "var(--paper-sunken)";
+        }}
+        onMouseLeave={(e) => {
+          if (!active) (e.currentTarget as HTMLElement).style.background = "transparent";
+        }}
+      >
+        <span
+          style={{
+            fontFamily: "var(--font-mono)",
+            fontSize: 10,
+            letterSpacing: "0.1em",
+            textTransform: "uppercase",
+            color: active ? "var(--ink-soft)" : "var(--ink-faint)",
+          }}
+        >
+          {label}
+        </span>
+        <span style={{ fontSize: 14 }}>{zh}</span>
+      </Link>
+    );
+  };
+
   return (
-    <aside className="w-52 shrink-0 border-r rule min-h-[calc(100vh-4rem)] sticky top-16 self-start flex flex-col">
-      <nav className="px-4 py-6 flex flex-col gap-0.5">
-        {ITEMS.map((it) => {
-          const active = isActive(it.href);
-          return (
-            <Link
-              key={it.href}
-              href={it.href}
-              className="flex items-baseline justify-between px-3 py-2 rounded-[8px] transition-colors"
-              style={{
-                background: active ? "var(--color-accent-wash)" : undefined,
-                color: active ? "var(--color-accent)" : "var(--color-ink)",
-              }}
-              onMouseEnter={(e) => {
-                if (!active) e.currentTarget.style.background = "var(--color-paper-sunken)";
-              }}
-              onMouseLeave={(e) => {
-                if (!active) e.currentTarget.style.background = "";
-              }}
-            >
-              <span
-                className="small-caps text-xs font-mono"
-                style={{ color: active ? "var(--color-accent)" : "var(--color-ink-mute)" }}
-              >
-                {it.label}
-              </span>
-              <span className="text-sm">{it.zh}</span>
-            </Link>
-          );
-        })}
+    <aside
+      style={{
+        width: "13rem",
+        flexShrink: 0,
+        borderRight: "1px solid var(--line-faint)",
+        minHeight: "calc(100vh - 64px)",
+        position: "sticky",
+        top: 64,
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      <nav style={{ padding: "20px 12px", display: "flex", flexDirection: "column", gap: 2 }}>
+        {ITEMS.map((it) => navItem(it.href, it.label, it.zh))}
 
         {canSeeAdmin(user) && (
           <>
-            <div className="my-3 border-t rule" />
-            {(() => {
-              const active = pathname.startsWith("/admin");
-              return (
-                <Link
-                  href="/admin"
-                  className="flex items-baseline justify-between px-3 py-2 rounded-[8px] transition-colors"
-                  style={{
-                    background: active ? "var(--color-accent-wash)" : undefined,
-                    color: active ? "var(--color-accent)" : "var(--color-ink)",
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!active) e.currentTarget.style.background = "var(--color-paper-sunken)";
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!active) e.currentTarget.style.background = "";
-                  }}
-                >
-                  <span
-                    className="small-caps text-xs font-mono"
-                    style={{ color: active ? "var(--color-accent)" : "var(--color-ink-mute)" }}
-                  >
-                    Admin
-                  </span>
-                  <span className="text-sm">管理后台</span>
-                </Link>
-              );
-            })()}
+            <div style={{ margin: "12px 0", borderTop: "1px solid var(--line-faint)" }} />
+            {navItem("/admin", "Admin", "管理后台")}
           </>
         )}
       </nav>
 
-      <div className="mt-auto px-5 py-5 border-t rule">
-        <div className="font-mono leading-loose tracking-widest uppercase" style={{ fontSize: 10, color: "var(--color-ink-mute)" }}>
+      <div style={{ marginTop: "auto", padding: "20px 16px", borderTop: "1px solid var(--line-faint)" }}>
+        <div
+          style={{
+            fontFamily: "var(--font-mono)",
+            fontSize: 10,
+            letterSpacing: "0.08em",
+            textTransform: "uppercase",
+            lineHeight: 1.8,
+            color: "var(--ink-faint)",
+          }}
+        >
           BFSU
           <br />
           Creative Association

@@ -18,82 +18,171 @@ export function TopBar() {
 
   return (
     <header
-      className="border-b rule sticky top-0 z-30"
-      style={{ background: "color-mix(in srgb, var(--color-paper) 90%, transparent)", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)" } as React.CSSProperties}
+      style={{
+        position: "sticky",
+        top: 0,
+        zIndex: 30,
+        height: 64,
+        display: "flex",
+        alignItems: "center",
+        background: "color-mix(in srgb, var(--surface) 80%, transparent)",
+        backdropFilter: "blur(20px) saturate(1.8)",
+        WebkitBackdropFilter: "blur(20px) saturate(1.8)",
+        borderBottom: "1px solid var(--line-faint)",
+      } as React.CSSProperties}
     >
-      <div className="px-6 h-16 flex items-center justify-between">
-        <Link href="/" className="flex items-baseline gap-3 select-none">
-          <span className="display text-2xl">
-            <span style={{ color: "var(--color-accent)" }}>创</span>协
-          </span>
-          <span className="meta hidden sm:inline">BFSU · Creative Association</span>
+      <div
+        style={{
+          width: "100%",
+          padding: "0 24px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
+        <Link
+          href="/"
+          style={{
+            fontSize: 17,
+            fontWeight: 600,
+            letterSpacing: "-0.02em",
+            color: "var(--ink)",
+            textDecoration: "none",
+          }}
+        >
+          创协
         </Link>
 
-        <div className="flex items-center gap-4">
+        <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
           <button
-            className="flex items-center gap-1.5 text-ink-soft hover:text-ink transition-colors text-sm"
+            style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, color: "var(--ink-soft)", background: "none", border: "none", cursor: "pointer", transition: "color 120ms" }}
             aria-label="搜索"
+            onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.color = "var(--ink)")}
+            onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.color = "var(--ink-soft)")}
           >
             <Search size={15} strokeWidth={1.75} />
             <span className="hidden md:inline">搜索</span>
           </button>
 
           <button
-            className="relative flex items-center gap-1.5 text-ink-soft hover:text-ink transition-colors text-sm"
+            style={{ position: "relative", display: "flex", alignItems: "center", gap: 6, fontSize: 13, color: "var(--ink-soft)", background: "none", border: "none", cursor: "pointer", transition: "color 120ms" }}
             aria-label="通知"
+            onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.color = "var(--ink)")}
+            onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.color = "var(--ink-soft)")}
           >
             <Bell size={15} strokeWidth={1.75} />
             <span className="hidden md:inline">通知</span>
             <span
-              className="absolute -top-1.5 -right-2 inline-flex items-center justify-center w-4 h-4 rounded-full text-[9px] text-white font-mono"
-              style={{ background: "var(--color-accent)" }}
+              style={{
+                position: "absolute",
+                top: -6,
+                right: -6,
+                width: 16,
+                height: 16,
+                borderRadius: 999,
+                background: "var(--ink)",
+                color: "#fff",
+                fontSize: 9,
+                fontFamily: "var(--font-mono)",
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
             >
               3
             </span>
           </button>
 
           {user ? (
-            <div className="relative">
+            <div style={{ position: "relative" }}>
               <button
                 onClick={() => setMenuOpen((v) => !v)}
-                className="flex items-center gap-2"
+                style={{ display: "flex", alignItems: "center", gap: 8, background: "none", border: "none", cursor: "pointer" }}
               >
                 <span
-                  className="w-7 h-7 rounded-full grid place-items-center font-serif text-sm text-white"
-                  style={{ background: "var(--color-accent)" }}
+                  style={{
+                    width: 28,
+                    height: 28,
+                    borderRadius: 999,
+                    background: "var(--ink)",
+                    color: "#fff",
+                    display: "grid",
+                    placeItems: "center",
+                    fontFamily: "var(--font-sans)",
+                    fontSize: 12,
+                    fontWeight: 600,
+                  }}
                 >
                   {user.name.slice(-1)}
                 </span>
-                <span className="hidden md:inline text-sm text-ink">{user.name}</span>
+                <span className="hidden md:inline" style={{ fontSize: 14, color: "var(--ink)" }}>{user.name}</span>
                 <ChevronDown
                   size={13}
                   strokeWidth={2}
-                  className="text-ink-mute transition-transform duration-150"
-                  style={{ transform: menuOpen ? "rotate(180deg)" : "rotate(0deg)" }}
+                  style={{
+                    color: "var(--ink-mute)",
+                    transition: "transform 150ms",
+                    transform: menuOpen ? "rotate(180deg)" : "rotate(0deg)",
+                  }}
                 />
               </button>
+
               {menuOpen && (
-                <div className="absolute right-0 top-full mt-2 w-56 bg-surface border rule rounded-[10px] shadow-lg overflow-hidden">
-                  <div className="px-4 py-3 border-b rule">
-                    <div className="text-sm font-medium text-ink">{user.name} · {user.nameEn}</div>
-                    <div className="meta mt-1">{user.department} · {ROLE_LABEL[user.role]}</div>
+                <div
+                  style={{
+                    position: "absolute",
+                    right: 0,
+                    top: "calc(100% + 8px)",
+                    width: 220,
+                    background: "var(--surface)",
+                    border: "1px solid var(--line)",
+                    borderRadius: 12,
+                    boxShadow: "var(--shadow-lg)",
+                    overflow: "hidden",
+                  }}
+                >
+                  <div style={{ padding: "14px 16px", borderBottom: "1px solid var(--line-faint)" }}>
+                    <div style={{ fontSize: 14, fontWeight: 500, color: "var(--ink)" }}>
+                      {user.name} · {user.nameEn}
+                    </div>
+                    <div
+                      style={{
+                        fontFamily: "var(--font-mono)",
+                        fontSize: 11,
+                        letterSpacing: "0.08em",
+                        textTransform: "uppercase",
+                        color: "var(--ink-mute)",
+                        marginTop: 4,
+                      }}
+                    >
+                      {user.department} · {ROLE_LABEL[user.role]}
+                    </div>
                   </div>
                   <Link
                     href="/profile"
                     onClick={() => setMenuOpen(false)}
-                    className="block px-4 py-2.5 text-sm text-ink hover:bg-paper transition-colors"
+                    style={{ display: "block", padding: "11px 16px", fontSize: 14, color: "var(--ink)", textDecoration: "none", transition: "background 120ms" }}
+                    onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = "var(--paper)")}
+                    onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = "")}
                   >
                     个人中心
                   </Link>
                   <button
-                    onClick={() => {
-                      setLocal(null);
-                      router.push("/login");
+                    onClick={() => { setLocal(null); router.push("/login"); }}
+                    style={{
+                      display: "block",
+                      width: "100%",
+                      textAlign: "left",
+                      padding: "11px 16px",
+                      fontSize: 14,
+                      color: "var(--color-danger)",
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                      transition: "background 120ms",
                     }}
-                    className="block w-full text-left px-4 py-2.5 text-sm transition-colors"
-                    style={{ color: "var(--color-danger)" }}
-                    onMouseEnter={(e) => (e.currentTarget.style.background = "var(--color-danger-wash)")}
-                    onMouseLeave={(e) => (e.currentTarget.style.background = "")}
+                    onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = "var(--color-danger-wash)")}
+                    onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = "")}
                   >
                     退出登录
                   </button>
@@ -103,8 +192,18 @@ export function TopBar() {
           ) : (
             <Link
               href="/login"
-              className="text-sm text-ink-soft hover:text-ink transition-colors underline underline-offset-4"
-              style={{ textDecorationColor: "var(--color-line)" }}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                height: "1.9rem",
+                padding: "0 1rem",
+                fontSize: 13,
+                fontWeight: 500,
+                color: "#fff",
+                background: "var(--ink)",
+                borderRadius: 999,
+                textDecoration: "none",
+              }}
             >
               登录
             </Link>
