@@ -4,6 +4,7 @@ import { useState } from "react";
 import { TASKS } from "@/lib/mock/data";
 import { findUser } from "@/lib/mock/users";
 import { TASK_CADENCE_LABEL, TASK_STATUS_LABEL, type Task, type TaskCadence, type TaskStatus } from "@/lib/types";
+import { PillGroup } from "@/components/ui/PillGroup";
 
 const COLUMNS: { key: TaskStatus; label: string }[] = [
   { key: "todo",   label: "待办" },
@@ -24,46 +25,6 @@ function isUrgent(ddl: string) {
   const d = new Date(ddl).getTime();
   const today = new Date("2026-05-21").getTime();
   return d - today < 24 * 3600 * 1000 * 2 && d >= today;
-}
-
-/* Reusable pill segmented control */
-function PillGroup<T extends string>({
-  options,
-  value,
-  onChange,
-}: {
-  options: { key: T; label: string }[];
-  value: T;
-  onChange: (v: T) => void;
-}) {
-  return (
-    <div style={{ display: "inline-flex", gap: 2, padding: 3, background: "var(--paper-sunken)", borderRadius: 999, border: "1px solid var(--line-faint)" }}>
-      {options.map(({ key, label }) => {
-        const active = value === key;
-        return (
-          <button
-            key={key}
-            onClick={() => onChange(key)}
-            style={{
-              fontFamily: "var(--font-sans)",
-              fontSize: 13,
-              padding: "4px 12px",
-              borderRadius: 999,
-              border: "none",
-              cursor: "pointer",
-              background: active ? "var(--surface)" : "transparent",
-              color: active ? "var(--ink)" : "var(--ink-mute)",
-              fontWeight: active ? 500 : 400,
-              boxShadow: active ? "var(--shadow-xs)" : "none",
-              transition: "background 120ms, color 120ms",
-            }}
-          >
-            {label}
-          </button>
-        );
-      })}
-    </div>
-  );
 }
 
 export default function TasksPage() {
@@ -88,11 +49,7 @@ export default function TasksPage() {
           <div className="meta">TASKS · 任务看板</div>
           <h1 className="display text-4xl mt-2">任务</h1>
         </div>
-        <button
-          style={{ display: "inline-flex", alignItems: "center", height: "2rem", padding: "0 1rem", fontSize: 13, fontWeight: 500, color: "#fff", background: "var(--ink)", border: "none", borderRadius: 999, cursor: "pointer" }}
-        >
-          + 新建任务
-        </button>
+        <button className="btn-outline px-4 h-8 text-sm">+ 新建任务</button>
       </div>
 
       {/* Toolbar */}

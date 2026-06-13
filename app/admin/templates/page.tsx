@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import clsx from "clsx";
 import { TEMPLATES } from "@/lib/mock/data";
 import { TEMPLATE_CATEGORY_LABEL, type Template, type TemplateCategory } from "@/lib/types";
+import { PillGroup } from "@/components/ui/PillGroup";
 
 const EXT_BADGE: Record<string, string> = {
   docx: "DOC",
@@ -39,7 +39,7 @@ export default function AdminTemplatesPage() {
         <h2 className="display text-2xl">模板管理</h2>
         <button
           onClick={() => setShowNew(true)}
-          className="px-4 py-2 text-sm bg-accent text-card hover:bg-accent-soft transition-colors rounded-full"
+          className="px-4 py-2 text-sm btn-outline"
         >
           + 新增模板
         </button>
@@ -117,7 +117,7 @@ export default function AdminTemplatesPage() {
               </button>
               <button
                 onClick={() => handleDelete(confirmDelete)}
-                className="text-sm px-4 py-2 bg-danger text-card hover:opacity-90 transition-colors rounded-full"
+                className="text-sm px-4 py-2 btn-outline-danger"
               >
                 确认删除
               </button>
@@ -224,20 +224,15 @@ function TemplateForm({
           </div>
           <div>
             <label className="meta text-xs block mb-1">分类</label>
-            <div className="flex gap-2 mt-1">
-              {(["general", "letter"] as TemplateCategory[]).map((c) => (
-                <button
-                  key={c}
-                  type="button"
-                  onClick={() => setForm({ ...form, category: c })}
-                  className={clsx(
-                    "px-3 py-1.5 text-sm border rule rounded-full transition-colors",
-                    form.category === c ? "bg-ink text-card border-ink" : "hover:border-ink"
-                  )}
-                >
-                  {TEMPLATE_CATEGORY_LABEL[c]}
-                </button>
-              ))}
+            <div className="mt-1">
+              <PillGroup
+                options={[
+                  { key: "general", label: TEMPLATE_CATEGORY_LABEL.general },
+                  { key: "letter", label: TEMPLATE_CATEGORY_LABEL.letter },
+                ]}
+                value={form.category}
+                onChange={(c) => setForm({ ...form, category: c })}
+              />
             </div>
           </div>
 
@@ -247,7 +242,7 @@ function TemplateForm({
             </button>
             <button
               type="submit"
-              className="text-sm px-4 py-2 bg-accent text-card hover:bg-accent-soft transition-colors rounded-full"
+              className="text-sm px-4 py-2 btn-outline"
             >
               {initial ? "保存修改" : "创建模板"}
             </button>

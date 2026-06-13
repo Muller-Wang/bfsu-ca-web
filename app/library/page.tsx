@@ -4,6 +4,7 @@ import { useState } from "react";
 import clsx from "clsx";
 import { ARCHIVE, TEMPLATES } from "@/lib/mock/data";
 import { EVENT_TAG_META, TEMPLATE_CATEGORY_LABEL, type ArchiveItem, type TemplateCategory } from "@/lib/types";
+import { PillGroup } from "@/components/ui/PillGroup";
 
 type Tab = "templates" | "archive";
 
@@ -75,20 +76,15 @@ function TemplateGrid({ query }: { query: string }) {
     <section className="rise rise-3">
       <div className="flex items-center justify-between mb-5">
         <div className="meta">TEMPLATES · {list.length}</div>
-        <div className="flex items-center gap-1 text-xs">
-          {(["all", "general", "letter"] as const).map((c) => (
-            <button
-              key={c}
-              onClick={() => setCat(c)}
-              className={clsx(
-                "px-3 py-1.5 border rule rounded-full transition-colors",
-                cat === c ? "bg-ink text-card border-ink" : "hover:border-ink"
-              )}
-            >
-              {c === "all" ? "全部" : TEMPLATE_CATEGORY_LABEL[c]}
-            </button>
-          ))}
-        </div>
+        <PillGroup
+          options={[
+            { key: "all", label: "全部" },
+            { key: "general", label: TEMPLATE_CATEGORY_LABEL.general },
+            { key: "letter", label: TEMPLATE_CATEGORY_LABEL.letter },
+          ]}
+          value={cat}
+          onChange={setCat}
+        />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {list.map((tp) => (

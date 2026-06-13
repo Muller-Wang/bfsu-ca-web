@@ -9,6 +9,7 @@ import {
   type LiaisonCategory,
   type LiaisonStatus,
 } from "@/lib/types";
+import { PillGroup } from "@/components/ui/PillGroup";
 
 const EXT_BADGE: Record<string, string> = {
   docx: "DOC",
@@ -16,45 +17,6 @@ const EXT_BADGE: Record<string, string> = {
   md: "MD ",
   xlsx: "XLS",
 };
-
-function PillGroup<T extends string>({
-  options,
-  value,
-  onChange,
-}: {
-  options: { key: T; label: string }[];
-  value: T;
-  onChange: (v: T) => void;
-}) {
-  return (
-    <div style={{ display: "inline-flex", gap: 2, padding: 3, background: "var(--paper-sunken)", borderRadius: 999, border: "1px solid var(--line-faint)" }}>
-      {options.map(({ key, label }) => {
-        const active = value === key;
-        return (
-          <button
-            key={key}
-            onClick={() => onChange(key)}
-            style={{
-              fontFamily: "var(--font-sans)",
-              fontSize: 13,
-              padding: "4px 12px",
-              borderRadius: 999,
-              border: "none",
-              cursor: "pointer",
-              background: active ? "var(--surface)" : "transparent",
-              color: active ? "var(--ink)" : "var(--ink-mute)",
-              fontWeight: active ? 500 : 400,
-              boxShadow: active ? "var(--shadow-xs)" : "none",
-              transition: "background 120ms, color 120ms",
-            }}
-          >
-            {label}
-          </button>
-        );
-      })}
-    </div>
-  );
-}
 
 const CAT_OPTIONS = [
   { key: "all" as const,          label: "全部" },

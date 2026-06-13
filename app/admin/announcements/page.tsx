@@ -14,7 +14,7 @@ export default function AdminAnnouncementsPage() {
         </h2>
         <button
           onClick={() => setShowForm((v) => !v)}
-          className="px-4 py-2 text-sm bg-accent text-card hover:bg-accent-soft transition-colors rounded-full"
+          className="px-4 py-2 text-sm btn-outline"
         >
           + 发布新公告
         </button>
@@ -44,7 +44,7 @@ export default function AdminAnnouncementsPage() {
             </label>
             <div className="flex gap-2">
               <button onClick={() => setShowForm(false)} className="px-3 py-1.5 text-sm">取消</button>
-              <button className="px-4 py-1.5 text-sm bg-ink text-card rounded-full">发布</button>
+              <button className="px-4 py-1.5 text-sm btn-outline">发布</button>
             </div>
           </div>
         </div>

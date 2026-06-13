@@ -103,24 +103,7 @@ export default function CalendarPage() {
               </button>
             ))}
           </div>
-          <button
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              height: "2rem",
-              padding: "0 1rem",
-              fontSize: 13,
-              fontWeight: 500,
-              color: "#fff",
-              background: "var(--ink)",
-              border: "none",
-              borderRadius: 999,
-              cursor: "pointer",
-              transition: "opacity 120ms",
-            }}
-          >
-            + 新建
-          </button>
+          <button className="btn-outline px-4 h-8 text-sm">+ 新建</button>
         </div>
       </div>
 
@@ -260,7 +243,7 @@ export default function CalendarPage() {
               >
                 关闭
               </button>
-              <button className="text-sm px-4 py-1.5 bg-ink text-card rounded-full">
+              <button className="text-sm px-4 py-1.5 btn-outline">
                 查看详情
               </button>
             </div>

@@ -34,7 +34,7 @@ export default function AdminMembersPage() {
         <h2 className="display text-2xl">
           成员名单 <span className="meta ml-2">{members.length} 人</span>
         </h2>
-        <button className="px-4 py-2 text-sm bg-accent text-card hover:bg-accent-soft transition-colors rounded-full">
+        <button className="px-4 py-2 text-sm btn-outline">
           + 添加成员
         </button>
       </div>
@@ -170,7 +170,7 @@ export default function AdminMembersPage() {
               </button>
               <button
                 onClick={() => handleRemove(confirmTarget)}
-                className="text-sm px-4 py-2 bg-danger text-card hover:opacity-90 transition-colors rounded-full"
+                className="text-sm px-4 py-2 btn-outline-danger"
               >
                 确认除名
               </button>

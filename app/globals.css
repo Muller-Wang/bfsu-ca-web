@@ -177,3 +177,46 @@
 @media (prefers-reduced-motion: reduce) {
   .reveal { transition-duration: 1ms !important; }
 }
+
+/* ── Toolbar buttons — outline pill (secondary actions, not main CTA) ── */
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  border: 1px solid var(--color-line-strong);
+  border-radius: 999px;
+  color: var(--color-ink);
+  background: transparent;
+  cursor: pointer;
+  transition: background 120ms var(--ease-out), border-color 120ms var(--ease-out);
+}
+.btn-outline:hover {
+  background: var(--color-paper-sunken);
+  border-color: var(--color-ink);
+}
+.btn-outline:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.btn-outline:disabled:hover {
+  background: transparent;
+  border-color: var(--color-line-strong);
+}
+
+.btn-outline-danger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  border: 1px solid color-mix(in srgb, var(--color-danger) 45%, transparent);
+  border-radius: 999px;
+  color: var(--color-danger);
+  background: transparent;
+  cursor: pointer;
+  transition: background 120ms var(--ease-out), border-color 120ms var(--ease-out);
+}
+.btn-outline-danger:hover {
+  background: var(--color-danger-wash);
+  border-color: var(--color-danger);
+}

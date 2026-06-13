@@ -8,6 +8,7 @@ import {
   type IdeaCategory,
   type IdeaComment,
 } from "@/lib/types";
+import { PillGroup } from "@/components/ui/PillGroup";
 
 type SortKey = "latest" | "hot";
 
@@ -19,45 +20,6 @@ const CATEGORY_FILTERS = [
   { key: "internal" as const,   label: "内部" },
   { key: "other" as const,      label: "其他" },
 ];
-
-function PillGroup<T extends string>({
-  options,
-  value,
-  onChange,
-}: {
-  options: { key: T; label: string }[];
-  value: T;
-  onChange: (v: T) => void;
-}) {
-  return (
-    <div style={{ display: "inline-flex", gap: 2, padding: 3, background: "var(--paper-sunken)", borderRadius: 999, border: "1px solid var(--line-faint)" }}>
-      {options.map(({ key, label }) => {
-        const active = value === key;
-        return (
-          <button
-            key={key}
-            onClick={() => onChange(key)}
-            style={{
-              fontFamily: "var(--font-sans)",
-              fontSize: 13,
-              padding: "4px 12px",
-              borderRadius: 999,
-              border: "none",
-              cursor: "pointer",
-              background: active ? "var(--surface)" : "transparent",
-              color: active ? "var(--ink)" : "var(--ink-mute)",
-              fontWeight: active ? 500 : 400,
-              boxShadow: active ? "var(--shadow-xs)" : "none",
-              transition: "background 120ms, color 120ms",
-            }}
-          >
-            {label}
-          </button>
-        );
-      })}
-    </div>
-  );
-}
 
 export default function IdeasPage() {
   const [cat, setCat] = useState<IdeaCategory | "all">("all");
@@ -99,10 +61,7 @@ export default function IdeasPage() {
           <h1 className="display text-4xl mt-2">创意点子库</h1>
           <p className="meta mt-2">所有成员可公开或匿名提交创意，其他人可匿名评论讨论</p>
         </div>
-        <button
-          onClick={() => setShowNew(true)}
-          style={{ display: "inline-flex", alignItems: "center", height: "2rem", padding: "0 1rem", fontSize: 13, fontWeight: 500, color: "#fff", background: "var(--ink)", border: "none", borderRadius: 999, cursor: "pointer", flexShrink: 0 }}
-        >
+        <button onClick={() => setShowNew(true)} className="btn-outline px-4 h-8 text-sm shrink-0">
           + 提交点子
         </button>
       </div>
@@ -370,11 +329,7 @@ function NewIdeaForm({ onSubmit, onCancel }: { onSubmit: (idea: Idea) => void; o
             >
               取消
             </button>
-            <button
-              type="submit"
-              disabled={!title.trim() || !body.trim()}
-              style={{ fontSize: 13, padding: "6px 20px", border: "none", borderRadius: 999, cursor: "pointer", background: "var(--ink)", color: "#fff", opacity: (!title.trim() || !body.trim()) ? 0.4 : 1, transition: "opacity 120ms" }}
-            >
+            <button type="submit" disabled={!title.trim() || !body.trim()} className="btn-outline px-5 py-1.5 text-sm">
               提交点子
             </button>
           </div>
