@@ -1,8 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect } from "react";
 import clsx from "clsx";
+import { canSeeAdmin, useCurrentUser } from "@/lib/auth";
 
 const ADMIN_NAV = [
   { href: "/admin", label: "成员管理", en: "MEMBERS" },
@@ -15,8 +17,27 @@ const ADMIN_NAV = [
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const { user, ready } = useCurrentUser();
+  const allowed = canSeeAdmin(user);
+
+  // 权限守卫：仅社长/副社长/秘书处可访问，其余角色直接访问 URL 会被拦回主页
+  useEffect(() => {
+    if (ready && !allowed) {
+      router.replace("/dashboard");
+    }
+  }, [allowed, ready, router]);
+
+  if (!allowed) {
+    return (
+      <div className="min-h-[40vh] grid place-items-center">
+        <span className="meta">checking permission…</span>
+      </div>
+    );
+  }
+
   return (
-    <div className="px-10 py-10 max-w-6xl">
+    <div className="page-shell max-w-6xl">
       <div className="rise rise-1 mb-2">
         <div className="meta">ADMIN · 管理后台</div>
         <h1 className="display text-4xl mt-2">管理后台</h1>
@@ -25,9 +46,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
       <hr className="border-t rule my-8" />
 
-      <div className="grid grid-cols-[200px_1fr] gap-10">
+      <div className="grid grid-cols-1 gap-7 lg:grid-cols-[200px_1fr] lg:gap-10">
         <aside className="rise rise-2">
-          <nav className="flex flex-col gap-1">
+          <nav className="flex gap-5 overflow-x-auto border-b rule lg:flex-col lg:gap-1 lg:border-0">
             {ADMIN_NAV.map((it) => {
               const active = pathname === it.href;
               return (
@@ -35,7 +56,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   key={it.href}
                   href={it.href}
                   className={clsx(
-                    "flex items-baseline justify-between py-2 transition-colors group",
+                    "flex shrink-0 items-baseline justify-between gap-3 py-2 transition-colors group",
                     active ? "text-ink font-medium" : "text-ink-soft hover:text-ink"
                   )}
                 >

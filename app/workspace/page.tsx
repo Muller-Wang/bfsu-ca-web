@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { LIAISONS, TEMPLATES } from "@/lib/mock/data";
+import { useClubData } from "@/lib/club-data";
 import {
   LIAISON_CATEGORY_LABEL,
   LIAISON_STATUS_COLOR,
@@ -10,6 +10,7 @@ import {
   type LiaisonStatus,
 } from "@/lib/types";
 import { PillGroup } from "@/components/ui/PillGroup";
+import { EmptyState, PageError, PageLoading } from "@/components/ui/PageState";
 
 const EXT_BADGE: Record<string, string> = {
   docx: "DOC",
@@ -29,21 +30,26 @@ const CAT_OPTIONS = [
 export default function WorkspacePage() {
   const [cat, setCat] = useState<LiaisonCategory | "all">("all");
   const [statusFilter, setStatusFilter] = useState<LiaisonStatus | "all">("all");
+  const { data, loading, error, refresh } = useClubData();
+  if (loading && !data) return <PageLoading label="正在加载外联工作区" />;
+  if (error && !data) return <PageError message={error} onRetry={() => void refresh()} />;
+  if (!data) return null;
+  const { liaisons, templates } = data;
 
-  const filtered = LIAISONS.filter((l) => {
+  const filtered = liaisons.filter((l) => {
     const matchCat = cat === "all" || l.category === cat;
     const matchStatus = statusFilter === "all" || l.status === statusFilter;
     return matchCat && matchStatus;
   });
 
-  const letterTemplates = TEMPLATES.filter((t) => t.category === "letter");
+  const letterTemplates = templates.filter((t) => t.category === "letter");
 
-  const activeCount    = LIAISONS.filter((l) => l.status === "cooperating" || l.status === "negotiating").length;
-  const completedCount = LIAISONS.filter((l) => l.status === "completed").length;
-  const pendingCount   = LIAISONS.filter((l) => l.status === "contacting").length;
+  const activeCount    = liaisons.filter((l) => l.status === "cooperating" || l.status === "negotiating").length;
+  const completedCount = liaisons.filter((l) => l.status === "completed").length;
+  const pendingCount   = liaisons.filter((l) => l.status === "contacting").length;
 
   return (
-    <div className="px-10 py-10 max-w-6xl">
+    <div className="page-shell max-w-6xl">
       {/* Header */}
       <div className="rise rise-1 mb-3">
         <div className="meta">WORKSPACE · 外联工作区</div>
@@ -54,7 +60,7 @@ export default function WorkspacePage() {
       <hr className="border-t rule my-8" />
 
       {/* KPI Cards */}
-      <div className="rise rise-2 grid grid-cols-3 gap-5 mb-8">
+      <div className="rise rise-2 grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-5 mb-8">
         {[
           { label: "进行中", count: activeCount,    sub: "合作 + 洽谈" },
           { label: "已完成", count: completedCount, sub: "历史合作" },
@@ -83,7 +89,7 @@ export default function WorkspacePage() {
         ))}
       </div>
 
-      <div className="grid grid-cols-[1fr_300px] gap-10">
+      <div className="grid grid-cols-1 xl:grid-cols-[1fr_300px] gap-10">
         {/* Main: liaison list */}
         <section className="rise rise-3 min-w-0">
           <div className="flex items-center gap-4 mb-6 flex-wrap">
@@ -106,7 +112,8 @@ export default function WorkspacePage() {
           </div>
 
           {/* Table */}
-          <div className="border-t rule">
+          <div className="table-scroll border-t rule">
+            <div className="min-w-[760px]">
             <div className="grid grid-cols-[1.2fr_80px_80px_120px_1fr_120px] gap-3 py-3 border-b rule">
               {["单位名称", "类型", "状态", "联系人", "备注", "下一步"].map((h) => (
                 <span key={h} className="meta">{h}</span>
@@ -139,6 +146,7 @@ export default function WorkspacePage() {
             {filtered.length === 0 && (
               <div className="py-10 text-center text-sm text-ink-soft">无匹配的外联记录</div>
             )}
+            </div>
           </div>
         </section>
 
@@ -173,16 +181,18 @@ export default function WorkspacePage() {
                 </div>
                 <div className="flex items-center justify-between mt-2">
                   <span className="meta text-[10px]">{tp.version} · {tp.size}</span>
-                  <button
+                  {tp.downloadUrl ? <a
+                    href={tp.downloadUrl}
                     style={{ fontSize: 12, color: "var(--ink-soft)", background: "none", border: "none", borderBottom: "1px solid var(--line)", cursor: "pointer", padding: "1px 0", transition: "color 120ms, border-color 120ms" }}
                     onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = "var(--ink)"; (e.currentTarget as HTMLElement).style.borderColor = "var(--ink)"; }}
                     onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = "var(--ink-soft)"; (e.currentTarget as HTMLElement).style.borderColor = "var(--line)"; }}
                   >
                     ↓ 下载
-                  </button>
+                  </a> : <span className="text-xs text-ink-mute">尚未上传</span>}
                 </div>
               </div>
             ))}
+            {letterTemplates.length === 0 && <div className="p-4"><EmptyState title="暂无书信模板" detail="模板上传后会显示在这里。" /></div>}
           </div>
           <div
             className="mt-4 px-4 py-3 text-xs text-ink-soft"

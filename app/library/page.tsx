@@ -2,9 +2,12 @@
 
 import { useState } from "react";
 import clsx from "clsx";
-import { ARCHIVE, TEMPLATES } from "@/lib/mock/data";
+import { useClubData } from "@/lib/club-data";
+import type { Template } from "@/lib/types";
 import { EVENT_TAG_META, TEMPLATE_CATEGORY_LABEL, type ArchiveItem, type TemplateCategory } from "@/lib/types";
 import { PillGroup } from "@/components/ui/PillGroup";
+import { parseLocalDate } from "@/lib/date";
+import { EmptyState, PageError, PageLoading } from "@/components/ui/PageState";
 
 type Tab = "templates" | "archive";
 
@@ -18,11 +21,15 @@ const EXT_BADGE: Record<string, string> = {
 export default function LibraryPage() {
   const [tab, setTab] = useState<Tab>("templates");
   const [query, setQuery] = useState("");
+  const { data, loading, error, refresh } = useClubData();
+  if (loading && !data) return <PageLoading label="正在加载资料库" />;
+  if (error && !data) return <PageError message={error} onRetry={() => void refresh()} />;
+  if (!data) return null;
 
   return (
-    <div className="px-10 py-10 max-w-6xl">
+    <div className="page-shell max-w-6xl">
       {/* Header */}
-      <div className="rise rise-1 flex items-end justify-between mb-3">
+      <div className="rise rise-1 flex flex-col items-start justify-between gap-5 sm:flex-row sm:items-end mb-3">
         <div>
           <div className="meta">LIBRARY · 资料库</div>
           <h1 className="display text-4xl mt-2">资料库</h1>
@@ -33,7 +40,7 @@ export default function LibraryPage() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="搜索文件…"
-            className="bg-transparent outline-none py-1 text-sm w-56"
+          className="bg-transparent outline-none py-1 text-sm w-full sm:w-56"
           />
         </div>
       </div>
@@ -58,15 +65,15 @@ export default function LibraryPage() {
         ))}
       </div>
 
-      {tab === "templates" ? <TemplateGrid query={query} /> : <ArchiveTimeline query={query} />}
+      {tab === "templates" ? <TemplateGrid query={query} templates={data.templates} /> : <ArchiveTimeline query={query} archives={data.archives} />}
     </div>
   );
 }
 
-function TemplateGrid({ query }: { query: string }) {
+function TemplateGrid({ query, templates }: { query: string; templates: Template[] }) {
   const [cat, setCat] = useState<TemplateCategory | "all">("all");
 
-  const list = TEMPLATES.filter((t) => {
+  const list = templates.filter((t) => {
     const matchQuery = t.name.toLowerCase().includes(query.toLowerCase()) || t.nameEn.toLowerCase().includes(query.toLowerCase());
     const matchCat = cat === "all" || t.category === cat;
     return matchQuery && matchCat;
@@ -74,7 +81,7 @@ function TemplateGrid({ query }: { query: string }) {
 
   return (
     <section className="rise rise-3">
-      <div className="flex items-center justify-between mb-5">
+      <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center mb-5">
         <div className="meta">TEMPLATES · {list.length}</div>
         <PillGroup
           options={[
@@ -108,19 +115,28 @@ function TemplateGrid({ query }: { query: string }) {
             <hr className="border-t rule my-4" />
             <div className="flex items-center justify-between">
               <span className="meta">{tp.updatedAt} · {tp.size}</span>
-              <button className="text-sm border-b border-rule hover:border-accent hover:text-accent transition-colors">
-                ↓ 下载
-              </button>
+              {tp.downloadUrl ? <a href={tp.downloadUrl} className="text-sm border-b border-rule hover:border-accent hover:text-accent transition-colors">↓ 下载</a> : <span className="text-xs text-ink-mute">尚未上传</span>}
             </div>
           </article>
         ))}
       </div>
+      {list.length === 0 && <EmptyState title="没有匹配的模板" detail="尝试其他关键词或分类。" />}
     </section>
   );
 }
 
-function ArchiveTimeline({ query }: { query: string }) {
-  const list = ARCHIVE.filter((a) => a.title.toLowerCase().includes(query.toLowerCase()));
+function ArchiveTimeline({ query, archives }: { query: string; archives: ArchiveItem[] }) {
+  const [yearFilter, setYearFilter] = useState("all");
+  const [deptFilter, setDeptFilter] = useState("all");
+  const [tagFilter, setTagFilter] = useState("all");
+  const allYears = Array.from(new Set(archives.map((item) => item.date.slice(0, 4)))).sort().reverse();
+  const departments = Array.from(new Set(archives.map((item) => item.department).filter(Boolean)));
+  const list = archives.filter((a) =>
+    a.title.toLowerCase().includes(query.toLowerCase()) &&
+    (yearFilter === "all" || a.date.startsWith(yearFilter)) &&
+    (deptFilter === "all" || a.department === deptFilter) &&
+    (tagFilter === "all" || a.tag === tagFilter)
+  );
   const grouped = list.reduce<Record<string, ArchiveItem[]>>((acc, a) => {
     const ym = a.date.slice(0, 7);
     (acc[ym] ||= []).push(a);
@@ -131,18 +147,23 @@ function ArchiveTimeline({ query }: { query: string }) {
   return (
     <section className="rise rise-3">
       {/* Filters */}
-      <div className="flex items-center gap-4 mb-8 text-sm">
+      <div className="flex flex-wrap items-center gap-4 mb-8 text-sm">
         <span className="meta">FILTER</span>
-        <select className="bg-transparent border-b rule pb-1 focus:border-ink outline-none">
-          <option>年份 · 2026</option>
+        <select value={yearFilter} onChange={(event) => setYearFilter(event.target.value)} className="bg-transparent border-b rule pb-1 focus:border-ink outline-none">
+          <option value="all">年份 · 全部</option>
+          {allYears.map((year) => <option key={year} value={year}>{year}</option>)}
         </select>
-        <select className="bg-transparent border-b rule pb-1 focus:border-ink outline-none">
-          <option>部门 · 全部</option>
+        <select value={deptFilter} onChange={(event) => setDeptFilter(event.target.value)} className="bg-transparent border-b rule pb-1 focus:border-ink outline-none">
+          <option value="all">部门 · 全部</option>
+          {departments.map((department) => <option key={department} value={department}>{department}</option>)}
         </select>
-        <select className="bg-transparent border-b rule pb-1 focus:border-ink outline-none">
-          <option>类型 · 全部</option>
+        <select value={tagFilter} onChange={(event) => setTagFilter(event.target.value)} className="bg-transparent border-b rule pb-1 focus:border-ink outline-none">
+          <option value="all">类型 · 全部</option>
+          {Object.entries(EVENT_TAG_META).map(([key, meta]) => <option key={key} value={key}>{meta.label}</option>)}
         </select>
       </div>
+
+      {list.length === 0 && <EmptyState title="没有匹配的归档" detail="调整年份、部门、类型或搜索关键词。" />}
 
       {years.map((year) => (
         <div key={year} className="mb-12">
@@ -151,7 +172,7 @@ function ArchiveTimeline({ query }: { query: string }) {
             .filter(([ym]) => ym.startsWith(year))
             .sort(([a], [b]) => b.localeCompare(a))
             .map(([ym, items]) => {
-              const monthName = new Date(`${ym}-01`).toLocaleDateString("en-US", { month: "long" }).toUpperCase();
+              const monthName = parseLocalDate(`${ym}-01`).toLocaleDateString("en-US", { month: "long" }).toUpperCase();
               return (
                 <div key={ym} className="mb-8">
                   <div className="flex items-center gap-4 mb-4">
@@ -162,10 +183,10 @@ function ArchiveTimeline({ query }: { query: string }) {
                     {items.map((a) => {
                       const tag = EVENT_TAG_META[a.tag];
                       return (
-                        <li key={a.id} className="grid grid-cols-[80px_1fr] gap-5 items-baseline">
+                        <li key={a.id} className="grid grid-cols-[60px_1fr] sm:grid-cols-[80px_1fr] gap-3 sm:gap-5 items-baseline">
                           <span className="font-mono text-sm text-ink-soft">{a.date.slice(5)}</span>
                           <div className="border-l rule pl-5 -ml-1">
-                            <div className="flex items-baseline justify-between gap-4">
+                            <div className="flex flex-col gap-2 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4">
                               <h3 className="text-base">
                                 <span className="text-accent mr-2">◇</span>
                                 {a.title}

@@ -28,9 +28,9 @@ const DEPTS = ["秘书处", "外联部", "学术部", "宣传部", "日语部", 
 function Card({ dark = false, children, style }: { dark?: boolean; children: React.ReactNode; style?: React.CSSProperties }) {
   return (
     <div
+      className="p-6 sm:p-[42px_44px]"
       style={{
         borderRadius: 28,
-        padding: "42px 44px",
         height: "100%",
         boxSizing: "border-box",
         background: dark ? "var(--ink)" : "var(--surface)",
@@ -63,9 +63,10 @@ export default function HomePage() {
       >
         <div style={{ maxWidth: 1024, margin: "0 auto", padding: "0 22px", height: 52, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <a href="#top" style={{ fontSize: 17, fontWeight: 600, letterSpacing: "-0.02em", color: "var(--ink)", textDecoration: "none" }}>
-            创协
+            创客俱乐部
           </a>
-          <nav style={{ display: "flex", alignItems: "center", gap: 26 }}>
+          <nav className="flex items-center gap-3 sm:gap-6">
+            <span className="hidden items-center gap-6 sm:flex">
             {[["工作", "#work"], ["部门", "#depts"], ["加入", "#join"]].map(([zh, href]) => (
               <a
                 key={href}
@@ -77,6 +78,7 @@ export default function HomePage() {
                 {zh}
               </a>
             ))}
+            </span>
             <Link
               href="/login"
               style={{
@@ -109,11 +111,11 @@ export default function HomePage() {
         <ParticleCanvas />
         <div style={{ position: "relative", zIndex: 1 }}>
           <div style={{ fontSize: 15, fontWeight: 500, color: "var(--ink-soft)", marginBottom: 20 }}>
-            北京外国语大学创意协会 · Est. 2014
+            北京外国语大学创客俱乐部 · Est. 2014
           </div>
           <h1
             style={{
-              fontSize: "clamp(56px, 9vw, 90px)",
+              fontSize: "clamp(38px, 12vw, 90px)",
               fontWeight: 600,
               letterSpacing: "-0.035em",
               lineHeight: 1.04,
@@ -169,20 +171,18 @@ export default function HomePage() {
       {/* ── Stats ── */}
       <section style={{ background: "var(--surface)", padding: "92px 24px" }}>
         <div
+          className="grid grid-cols-2 gap-8 sm:grid-cols-4 sm:gap-6"
           style={{
             maxWidth: 1024,
             margin: "0 auto",
-            display: "grid",
-            gridTemplateColumns: "repeat(4, 1fr)",
-            gap: 24,
             textAlign: "center",
           }}
         >
           {STATS.map(({ num, label }, i) => (
             <div key={i}>
               <div
+                className="text-4xl sm:text-[56px]"
                 style={{
-                  fontSize: 56,
                   fontWeight: 600,
                   letterSpacing: "-0.03em",
                   lineHeight: 1,
@@ -218,9 +218,9 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 18 }}>
+          <div className="grid grid-cols-6 gap-4 sm:gap-[18px]">
             {/* Large card — 活动策划 */}
-            <div style={{ gridColumn: "span 4" }}>
+            <div className="col-span-6 sm:col-span-4">
               <Card style={{ minHeight: 250 }}>
                 <h3 style={{ fontSize: 30, fontWeight: 600, letterSpacing: "-0.02em", margin: "0 0 12px", color: "var(--ink)" }}>
                   活动策划
@@ -249,7 +249,7 @@ export default function HomePage() {
 
             {/* Small cards */}
             {BENTO_SMALL.map((item, i) => (
-              <div key={i} style={{ gridColumn: i === 0 ? "span 2" : "span 2" }}>
+              <div key={i} className="col-span-6 sm:col-span-2">
                 <Card style={{ minHeight: 250 }}>
                   <h3 style={{ fontSize: 24, fontWeight: 600, letterSpacing: "-0.02em", margin: "0 0 10px", color: "var(--ink)" }}>
                     {item.zh}
@@ -260,7 +260,7 @@ export default function HomePage() {
             ))}
 
             {/* Dark card — departments */}
-            <div id="depts" style={{ gridColumn: "span 4" }}>
+            <div id="depts" className="col-span-6 sm:col-span-4">
               <Card dark style={{ minHeight: 230, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
                 <h3 style={{ fontSize: 24, fontWeight: 600, letterSpacing: "-0.02em", margin: 0, color: "var(--on-dark)" }}>
                   六个部门，一种语言：创意。
@@ -311,7 +311,7 @@ export default function HomePage() {
           成员登录系统。
         </h2>
         <p style={{ fontSize: 19, color: "var(--ink-soft)", margin: "16px auto 0", maxWidth: 460 }}>
-          任务、活动、资料库与学时——一处管理创协所有内部事务。
+          任务、活动、资料库与学时——一处管理创客俱乐部所有内部事务。
         </p>
         <div style={{ marginTop: 38 }}>
           <Link
@@ -338,13 +338,11 @@ export default function HomePage() {
       {/* ── Footer ── */}
       <footer style={{ background: "var(--paper)", borderTop: "1px solid var(--line-faint)" }}>
         <div
+          className="flex flex-col gap-4 text-center sm:flex-row sm:items-center sm:justify-between sm:text-left"
           style={{
             maxWidth: 1024,
             margin: "0 auto",
             padding: "28px 22px",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
           }}
         >
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -356,7 +354,7 @@ export default function HomePage() {
               style={{ objectFit: "contain", opacity: 0.5 }}
             />
             <span style={{ fontSize: 12, color: "var(--ink-mute)" }}>
-              北外创协 · BFSU Creative Association · Est. 2014
+              北外创客俱乐部 · BFSU Makers Club · Est. 2014
             </span>
           </div>
           <a href="#top" style={{ fontSize: 12, color: "var(--ink-soft)", textDecoration: "none" }}>

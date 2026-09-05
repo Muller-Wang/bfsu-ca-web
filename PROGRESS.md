@@ -1,107 +1,58 @@
 # bfsu-ca · 进度
 
-> 北外创协内部管理系统。Next.js 16 + Tailwind 4 + Bun，未来接 PostgreSQL。
+> 北京外国语大学创客俱乐部内部管理系统。封面标题：创意，在北外。
 
 ## 当前状态
 
-**v0.1 高保真静态原型完成**（2026-05-27）
-- 7 个主页面 + 1 登录页 + 6 个 admin 子页全部跑通
-- 10 名 mock 用户、覆盖 6 种角色（含副社长）
-- 编辑部书桌（Editorial Stationery）设计语言落地
-- 无后端，localStorage mock auth
+**v0.3 P0 + P1 上线基础完成**（2026-09-05）
 
-**截图：** `docs/screens/00-20-*.png`
-**设计文档：** `docs/design/2026-05-21-wireframe.md`
+- Next.js 16 + PostgreSQL 数据层，页面不再直接读取 mock 数据
+- 学号/密码登录、bcrypt 密码、HttpOnly 签名会话与服务端角色权限
+- 成员、活动、任务、公告、学时、模板和点子关键操作已接真实 API
+- 模板文件支持鉴权上传与下载；安全响应头、同源校验和登录限流已启用
+- Demo 内容保留在 `lib/mock/`，但仅在服务端 `DEMO_MODE=1` 时启用
+- 默认正式模式不返回 demo 账号，不开放 demo 登录接口
+- 普通登录页不显示 Demo；仅 `/login?presentation=1` 可在演示环境调出角色切换
+- 完成手机端导航、页面布局、日历/宽表滑动和移动端表单适配
+- 补齐加载骨架、空状态、操作错误反馈、键盘焦点、404 与全局错误页
+- 资料库归档筛选已真实生效，主页活动与公告统计来自实时数据
 
 ## 启动
 
+正式模式需要 PostgreSQL：
+
 ```bash
-cd ~/projects/bfsu-ca
-bun dev        # http://localhost:3100
+cp .env.example .env.local
+bun run db:schema
+bun run db:seed
+bun run dev
 ```
 
-快速切换角色：登录页底部有 5 个 demo 用户按钮（社长 / 副社长 / 秘书处 / 部长 / 学术部长）。
-社长（张明 23110301001）、副社长（墨乐 23110301007）、秘书处（林思齐 23110301099）登录后侧栏多一个「管理后台」入口。
+临时展示模式：
 
-## 路由
-
-| 路由 | 页面 | 权限 |
-|------|------|------|
-| `/login` | 登录（学号 + 密码） | 公开 |
-| `/` | Dashboard 主页 | 全员 |
-| `/calendar` | 日历 | 全员 |
-| `/tasks` | 任务看板 | 全员（视图按角色过滤） |
-| `/workspace` | 外联工作区（外联进度 + 书信模版下载） | 全员 |
-| `/library` | 资料库（模板含二级分类 + 归档） | 全员 |
-| `/profile` | 个人中心（任务/活动/学时/文件） | 全员 |
-| `/admin` | 成员管理 | 仅社长/副社长/秘书处 |
-| `/admin/events` | 活动管理 | 仅社长/副社长/秘书处 |
-| `/admin/credits` | 学时管理 | 仅社长/副社长/秘书处 |
-| `/admin/templates` | 模板管理（增删改查） | 仅社长/副社长/秘书处 |
-| `/admin/permissions` | 权限设置 | 仅社长/副社长/秘书处 |
-| `/admin/announcements` | 系统公告 | 仅社长/副社长/秘书处 |
-
-## 下一步
-
-按优先级：
-
-1. **拿原型给社团内部审阅** — 截图发群，看 6 个页面是否符合各部门预期
-2. **Postgres schema 设计** — 8 张表（users / departments / events / tasks / announcements / templates / archives / credits / sessions）
-3. **Auth 接入** — 学号 + bcrypt 密码 + session cookie；先不上 NextAuth，自己写更可控
-4. **数据接入** — 把 `lib/mock/data.ts` 换成 server actions + Postgres 查询
-5. **预备期审批流** — 60 天到期由秘书处手动转正（默认方案）
-6. **活动归档上传** — 多文件拖拽 + 自动按活动名分桶
-
-## 待用户决策
-
-- [ ] 北外有没有官方学时系统？我们这边只记录还是要同步？
-- [ ] 通知怎么发：内站消息 / 邮箱 / 飞书 webhook？
-- [ ] 部署在哪：自建 VPS / Vercel + Neon / 学校机房？
-
-## 技术栈
-
-| 项 | 版本 |
-|----|------|
-| Next.js | 16.2.6（Turbopack） |
-| React | 19.2.4 |
-| Tailwind | 4.3.0（`@theme` in CSS） |
-| TypeScript | 5.9.3 |
-| Bun | runtime + pm |
-| 字体 | next/font/google（Newsreader / Geist / JetBrains Mono） |
-
-## 目录结构
-
+```bash
+DEMO_MODE=1 bun run dev
 ```
-bfsu-ca/
-├── app/
-│   ├── layout.tsx          # 字体注入 + AppShell
-│   ├── globals.css         # Tailwind 4 主题 + editorial 工具类
-│   ├── page.tsx            # Dashboard
-│   ├── login/page.tsx
-│   ├── calendar/page.tsx
-│   ├── tasks/page.tsx
-│   ├── workspace/page.tsx  # 外联工作区（外联跟踪 + 书信模版）
-│   ├── library/page.tsx    # 资料库（模板二级分类 + 归档）
-│   ├── profile/page.tsx
-│   └── admin/
-│       ├── layout.tsx
-│       ├── page.tsx              # members
-│       ├── events/page.tsx
-│       ├── credits/page.tsx
-│       ├── templates/page.tsx    # 模板 CRUD
-│       ├── permissions/page.tsx
-│       └── announcements/page.tsx
-├── components/shell/
-│   ├── AppShell.tsx       # 路由守卫 + 布局
-│   ├── TopBar.tsx
-│   └── SideNav.tsx
-├── lib/
-│   ├── types.ts           # 含 LiaisonEntry / TemplateCategory 等新增类型
-│   ├── auth.ts            # localStorage mock auth
-│   └── mock/
-│       ├── users.ts
-│       └── data.ts        # + LIAISONS (11条外联记录) + 6封书信模版
-└── docs/
-    ├── design/2026-05-21-wireframe.md
-    └── screens/           # 21 张验证截图
+
+两种模式均访问 `http://localhost:3100`。完整配置和上线步骤见 `README.md`。
+
+## 验证
+
+```bash
+bun run lint
+bun run typecheck
+bun run build
+bun audit
 ```
+
+## 下一阶段（P2）
+
+- 邮件/飞书通知与文件对象存储（取决于部署选择）
+- PostgreSQL 环境的自动化集成测试与备份恢复演练
+- 操作审计查询、会话管理和更细粒度的权限配置
+
+## 待确认
+
+- 北外官方学时系统是仅做记录，还是需要同步
+- 通知渠道采用站内、邮箱还是飞书 webhook
+- 部署采用自建 VPS、Vercel + Neon，还是学校机房

@@ -1,21 +1,25 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import clsx from "clsx";
-import { USERS } from "@/lib/mock/users";
-import { ROLE_LABEL, type Role, type User } from "@/lib/types";
-import { canRemoveMember, getStoredUser } from "@/lib/auth";
+import { ROLE_LABEL, type Department, type Role, type User } from "@/lib/types";
+import { canRemoveMember, useCurrentUser } from "@/lib/auth";
+import { runAction, useClubData } from "@/lib/club-data";
+import { EmptyState, SectionError, SectionLoading } from "@/components/ui/PageState";
 
 export default function AdminMembersPage() {
   const [status, setStatus] = useState<Role | "all">("all");
   const [dept, setDept] = useState<string>("all");
-  const [members, setMembers] = useState<User[]>(USERS);
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const { user: currentUser } = useCurrentUser();
+  const { data, loading, error, refresh } = useClubData();
   const [confirmTarget, setConfirmTarget] = useState<User | null>(null);
+  const [showNew, setShowNew] = useState(false);
+  const [actionError, setActionError] = useState("");
 
-  useEffect(() => {
-    setCurrentUser(getStoredUser());
-  }, []);
+  if (loading && !data) return <SectionLoading label="正在加载成员" />;
+  if (error && !data) return <SectionError message={error} onRetry={() => void refresh()} />;
+  if (!data) return null;
+  const members = data.users;
 
   const filtered = members.filter((u) => status === "all" || u.role === status)
     .filter((u) => dept === "all" || u.department === dept);
@@ -23,23 +27,35 @@ export default function AdminMembersPage() {
   const depts = Array.from(new Set(members.map((u) => u.department)));
   const allowRemove = canRemoveMember(currentUser);
 
-  const handleRemove = (target: User) => {
-    setMembers((prev) => prev.filter((u) => u.id !== target.id));
-    setConfirmTarget(null);
+  const handleRemove = async (target: User) => {
+    setActionError("");
+    try {
+      await runAction("removeUser", { id: target.id });
+      await refresh();
+      setConfirmTarget(null);
+    } catch (cause) { setActionError(cause instanceof Error ? cause.message : "移除失败"); }
+  };
+
+  const promote = async (target: User) => {
+    setActionError("");
+    try {
+      await runAction("updateUser", { id: target.id, role: "member" });
+      await refresh();
+    } catch (cause) { setActionError(cause instanceof Error ? cause.message : "更新失败"); }
   };
 
   return (
     <div>
-      <div className="flex items-baseline justify-between mb-5">
+      <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-baseline mb-5">
         <h2 className="display text-2xl">
           成员名单 <span className="meta ml-2">{members.length} 人</span>
         </h2>
-        <button className="px-4 py-2 text-sm btn-outline">
+        <button onClick={() => setShowNew(true)} className="px-4 py-2 text-sm btn-outline">
           + 添加成员
         </button>
       </div>
 
-      <div className="flex items-center gap-4 mb-6 text-sm">
+      <div className="flex flex-wrap items-center gap-4 mb-6 text-sm">
         <select
           value={status}
           onChange={(e) => setStatus(e.target.value as Role | "all")}
@@ -64,8 +80,10 @@ export default function AdminMembersPage() {
           ))}
         </select>
       </div>
+      {actionError && <div className="mb-4"><SectionError message={actionError} /></div>}
 
-      <div className="border-t rule">
+      <div className="table-scroll border-t rule">
+        <div className="min-w-[860px]">
         <div className="grid grid-cols-[140px_100px_100px_90px_100px_90px_160px] gap-4 py-3 border-b rule">
           {["工号", "姓名", "部门", "职务", "状态", "入会", "操作"].map((h) => (
             <span key={h} className="meta">{h}</span>
@@ -97,10 +115,8 @@ export default function AdminMembersPage() {
             </span>
             <span className="font-mono text-xs text-ink-soft">{u.joinDate.slice(2, 7).replace("-", "/")}</span>
             <span className="flex items-center gap-2 text-xs">
-              <button className="border-b rule hover:border-ink">查看</button>
-              <button className="border-b rule hover:border-ink">编辑</button>
               {u.role === "probation" && (
-                <button className="border-b rule text-accent hover:border-accent">转正</button>
+                <button onClick={() => void promote(u)} className="border-b rule text-accent hover:border-accent">转正</button>
               )}
               {allowRemove ? (
                 <button
@@ -120,7 +136,9 @@ export default function AdminMembersPage() {
             </span>
           </div>
         ))}
+        </div>
       </div>
+      {filtered.length === 0 && <EmptyState title="没有匹配的成员" detail="调整状态或部门筛选条件。" />}
 
       {/* Permission hint */}
       {!allowRemove && (
@@ -138,15 +156,26 @@ export default function AdminMembersPage() {
         </div>
       )}
 
+      {/* New member modal */}
+      {showNew && (
+        <MemberForm
+          onCreated={() => {
+            void refresh();
+            setShowNew(false);
+          }}
+          onCancel={() => setShowNew(false)}
+        />
+      )}
+
       {/* Confirm dialog */}
       {confirmTarget && (
         <div
-          className="fixed inset-0 bg-ink/40 backdrop-blur-sm grid place-items-center z-50 px-6"
+          className="modal-backdrop fixed inset-0 bg-ink/40 backdrop-blur-sm grid place-items-center z-50"
           onClick={() => setConfirmTarget(null)}
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="bg-card border rule rounded-sm max-w-md w-full shadow-2xl"
+            className="modal-panel bg-card border rule rounded-sm max-w-md w-full shadow-2xl"
           >
             <div className="px-7 py-6 border-b rule">
               <div className="meta text-danger mb-2">⚠ DANGER · 不可撤销</div>
@@ -169,7 +198,7 @@ export default function AdminMembersPage() {
                 取消
               </button>
               <button
-                onClick={() => handleRemove(confirmTarget)}
+                onClick={() => void handleRemove(confirmTarget)}
                 className="text-sm px-4 py-2 btn-outline-danger"
               >
                 确认除名
@@ -178,6 +207,151 @@ export default function AdminMembersPage() {
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+/* ── 添加成员表单 ── */
+
+const DEPARTMENTS: Department[] = ["社长办", "秘书处", "外联部", "学术部", "宣传部", "日语部", "德语部"];
+
+const ROLE_OPTIONS: Role[] = ["member", "probation", "head", "secretary", "vice_president", "president"];
+
+function MemberForm({
+  onCreated,
+  onCancel,
+}: {
+  onCreated: () => void;
+  onCancel: () => void;
+}) {
+  const [form, setForm] = useState({
+    id: "",
+    name: "",
+    nameEn: "",
+    department: "秘书处" as Department,
+    role: "probation" as Role,
+    title: "",
+    password: "",
+  });
+  const [error, setError] = useState("");
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    runAction("createUser", {
+      id: form.id, name: form.name, nameEn: form.nameEn || undefined,
+      department: form.department, role: form.role, title: form.title || undefined, password: form.password,
+    }).then(onCreated).catch((cause) => setError(cause instanceof Error ? cause.message : "创建失败"));
+  };
+
+  return (
+    <div
+      className="modal-backdrop fixed inset-0 bg-ink/40 backdrop-blur-sm grid place-items-center z-50"
+      onClick={onCancel}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="modal-panel bg-card border rule rounded-sm max-w-lg w-full shadow-2xl"
+      >
+        <div className="px-7 py-6 border-b rule">
+          <div className="meta mb-2">NEW MEMBER · 账号录入</div>
+          <h3 className="display text-2xl">添加成员</h3>
+        </div>
+        <form onSubmit={handleSubmit} className="px-7 py-5 space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="meta text-xs block mb-1">学号（登录账号）*</label>
+              <input
+                value={form.id}
+                onChange={(e) => setForm({ ...form, id: e.target.value })}
+                className="w-full bg-transparent border-b rule pb-1.5 outline-none focus:border-ink text-sm font-mono"
+                placeholder="26110301001"
+                required
+              />
+            </div>
+            <div>
+              <label className="meta text-xs block mb-1">初始密码 *</label>
+              <input
+                type="password"
+                value={form.password}
+                onChange={(e) => setForm({ ...form, password: e.target.value })}
+                className="w-full bg-transparent border-b rule pb-1.5 outline-none focus:border-ink text-sm font-mono"
+                placeholder="至少 8 位"
+                required
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="meta text-xs block mb-1">姓名 *</label>
+              <input
+                value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
+                className="w-full bg-transparent border-b rule pb-1.5 outline-none focus:border-ink text-sm"
+                required
+              />
+            </div>
+            <div>
+              <label className="meta text-xs block mb-1">拼音 / 英文名</label>
+              <input
+                value={form.nameEn}
+                onChange={(e) => setForm({ ...form, nameEn: e.target.value })}
+                className="w-full bg-transparent border-b rule pb-1.5 outline-none focus:border-ink text-sm"
+                placeholder="Zhang San"
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+              <label className="meta text-xs block mb-1">部门 *</label>
+              <select
+                value={form.department}
+                onChange={(e) => setForm({ ...form, department: e.target.value as Department })}
+                className="w-full bg-transparent border-b rule pb-1.5 outline-none focus:border-ink text-sm"
+              >
+                {DEPARTMENTS.map((d) => (
+                  <option key={d} value={d}>{d}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="meta text-xs block mb-1">状态 *</label>
+              <select
+                value={form.role}
+                onChange={(e) => setForm({ ...form, role: e.target.value as Role })}
+                className="w-full bg-transparent border-b rule pb-1.5 outline-none focus:border-ink text-sm"
+              >
+                {ROLE_OPTIONS.map((r) => (
+                  <option key={r} value={r}>{ROLE_LABEL[r]}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="meta text-xs block mb-1">职务</label>
+              <input
+                value={form.title}
+                onChange={(e) => setForm({ ...form, title: e.target.value })}
+                className="w-full bg-transparent border-b rule pb-1.5 outline-none focus:border-ink text-sm"
+                placeholder="干事"
+              />
+            </div>
+          </div>
+
+          <p className="meta text-[10px] leading-relaxed">
+            工号自动生成 · 入会日期为今天 · 预备成员默认 60 天预备期
+          </p>
+
+          {error && <div className="text-sm text-danger">{error}</div>}
+
+          <div className="flex justify-end gap-3 pt-4 border-t rule mt-4">
+            <button type="button" onClick={onCancel} className="text-sm px-4 py-2 hover:text-ink">
+              取消
+            </button>
+            <button type="submit" className="text-sm px-4 py-2 btn-outline">
+              创建账号
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

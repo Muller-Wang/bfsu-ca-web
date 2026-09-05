@@ -1,6 +1,22 @@
+/**
+ * ⚠️ DEMO DATA —— 虚拟测试账户，仅用于原型展示。
+ * 本文件属可整体删除的隔离区，切除步骤见 lib/mock/README.md。
+ * 外部代码请通过 lib/auth.ts 的 resolveUserById 访问，勿直接依赖本表。
+ */
+import "server-only";
 import type { User } from "../types";
 
 export const USERS: User[] = [
+  {
+    id: "202420107031",
+    workNo: "CA-2026-001",
+    name: "王颢然",
+    nameEn: "Wang Haoran",
+    department: "社长办",
+    role: "president",
+    title: "社长",
+    joinDate: "2026-09-05",
+  },
   {
     id: "23110301001",
     workNo: "CA-2024-001",
@@ -93,6 +109,16 @@ export const USERS: User[] = [
     joinDate: "2025-03-10",
   },
   {
+    id: "23110301018",
+    workNo: "CA-2024-018",
+    name: "张驰",
+    nameEn: "Zhang Chi",
+    department: "宣传部",
+    role: "member",
+    title: "部员",
+    joinDate: "2024-09-15",
+  },
+  {
     id: "26110301002",
     workNo: "CA-2026-022",
     name: "苏婉",
@@ -104,6 +130,11 @@ export const USERS: User[] = [
     probationLeftDays: 45,
   },
 ];
+
+/** 仅供本地演示环境的普通登录使用；代码中不保存明文密码。 */
+export const LOCAL_LOGIN_PASSWORD_HASHES: Record<string, string> = {
+  "202420107031": "$2b$12$pkszrd2BfYVsfDv.aXfVh.TdUd30Ye77LqgsVzd1E2HdWxDVc3EFW",
+};
 
 export function findUser(id: string) {
   return USERS.find((u) => u.id === id);

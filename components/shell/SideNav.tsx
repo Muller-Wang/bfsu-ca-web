@@ -2,11 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
-import { canSeeAdmin, getStoredUser } from "@/lib/auth";
-import type { User } from "@/lib/types";
+import { canSeeAdmin, useCurrentUser } from "@/lib/auth";
 
-const ITEMS = [
+export const NAV_ITEMS = [
   { href: "/dashboard", label: "Dashboard", zh: "主页" },
   { href: "/calendar", label: "Calendar", zh: "日历" },
   { href: "/tasks", label: "Tasks", zh: "任务" },
@@ -18,11 +16,7 @@ const ITEMS = [
 
 export function SideNav() {
   const pathname = usePathname();
-  const [user, setUser] = useState<User | null>(null);
-
-  useEffect(() => {
-    setUser(getStoredUser());
-  }, []);
+  const { user } = useCurrentUser();
 
   const isActive = (href: string) =>
     pathname === href || (href !== "/dashboard" && pathname.startsWith(href));
@@ -70,6 +64,7 @@ export function SideNav() {
 
   return (
     <aside
+      className="hidden md:flex"
       style={{
         width: "13rem",
         flexShrink: 0,
@@ -77,12 +72,11 @@ export function SideNav() {
         minHeight: "calc(100vh - 64px)",
         position: "sticky",
         top: 64,
-        display: "flex",
         flexDirection: "column",
       }}
     >
       <nav style={{ padding: "20px 12px", display: "flex", flexDirection: "column", gap: 2 }}>
-        {ITEMS.map((it) => navItem(it.href, it.label, it.zh))}
+        {NAV_ITEMS.map((it) => navItem(it.href, it.label, it.zh))}
 
         {canSeeAdmin(user) && (
           <>
@@ -105,9 +99,9 @@ export function SideNav() {
         >
           BFSU
           <br />
-          Creative Association
+          BFSU Makers Club
           <br />
-          Internal · v0.1
+          Internal · v0.2
         </div>
       </div>
     </aside>

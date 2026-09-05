@@ -108,6 +108,7 @@ export interface Template {
   updatedAt: string;
   size?: string;
   category: TemplateCategory;
+  downloadUrl?: string;
 }
 
 export type LiaisonCategory = "club" | "enterprise" | "foundation" | "government";

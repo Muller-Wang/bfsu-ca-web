@@ -1,49 +1,35 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { USERS } from "./mock/users";
+import { api, getMe } from "./api-client";
 import type { User } from "./types";
-
-const KEY = "bfsu-ca:current-user";
 
 export function useCurrentUser() {
   const [user, setUser] = useState<User | null>(null);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    const stored = typeof window !== "undefined" ? window.localStorage.getItem(KEY) : null;
-    if (stored) {
-      const found = USERS.find((u) => u.id === stored);
-      if (found) setUser(found);
-    }
-    setReady(true);
+    let active = true;
+    getMe()
+      .then((value) => { if (active) setUser(value); })
+      .finally(() => { if (active) setReady(true); });
+    return () => { active = false; };
   }, []);
 
-  return { user, ready, setUser: setLocal };
+  return { user, ready, setUser };
 }
 
-export function setLocal(user: User | null) {
-  if (typeof window === "undefined") return;
-  if (user) window.localStorage.setItem(KEY, user.id);
-  else window.localStorage.removeItem(KEY);
-}
-
-export function getStoredUser(): User | null {
-  if (typeof window === "undefined") return null;
-  const id = window.localStorage.getItem(KEY);
-  if (!id) return null;
-  return USERS.find((u) => u.id === id) || null;
+export async function logout() {
+  await api<{ ok: true }>("/api/auth/logout", { method: "POST" });
 }
 
 export function canSeeAdmin(user: User | null) {
-  if (!user) return false;
-  return user.role === "president" || user.role === "vice_president" || user.role === "secretary";
+  return !!user && ["president", "vice_president", "secretary"].includes(user.role);
 }
 
 /** 除名成员：仅社长（president）可执行。副社长与秘书处不可。 */
 export function canRemoveMember(user: User | null) {
-  if (!user) return false;
-  return user.role === "president";
+  return user?.role === "president";
 }
 
 /** 删除活动：社长 / 副社长 / 秘书处均可 */

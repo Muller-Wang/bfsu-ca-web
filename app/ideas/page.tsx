@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { IDEAS, IDEA_COMMENTS } from "@/lib/mock/data";
+import { runAction, useClubData } from "@/lib/club-data";
 import {
   IDEA_CATEGORY_LABEL,
   type Idea,
@@ -9,6 +9,7 @@ import {
   type IdeaComment,
 } from "@/lib/types";
 import { PillGroup } from "@/components/ui/PillGroup";
+import { EmptyState, PageError, PageLoading, SectionError } from "@/components/ui/PageState";
 
 type SortKey = "latest" | "hot";
 
@@ -25,9 +26,13 @@ export default function IdeasPage() {
   const [cat, setCat] = useState<IdeaCategory | "all">("all");
   const [sort, setSort] = useState<SortKey>("latest");
   const [showNew, setShowNew] = useState(false);
-  const [ideas, setIdeas] = useState<Idea[]>(IDEAS);
-  const [comments, setComments] = useState<IdeaComment[]>(IDEA_COMMENTS);
   const [expanded, setExpanded] = useState<string | null>(null);
+  const [actionError, setActionError] = useState("");
+  const { data, loading, error, refresh } = useClubData();
+  if (loading && !data) return <PageLoading label="正在加载创意点子" />;
+  if (error && !data) return <PageError message={error} onRetry={() => void refresh()} />;
+  if (!data) return null;
+  const { ideas, comments } = data;
 
   const filtered = ideas
     .filter((i) => cat === "all" || i.category === cat)
@@ -37,25 +42,28 @@ export default function IdeasPage() {
         : b.upvotes - a.upvotes
     );
 
-  const handleUpvote = (id: string) => {
-    setIdeas((prev) =>
-      prev.map((i) => (i.id === id ? { ...i, upvotes: i.upvotes + 1 } : i))
-    );
+  const handleUpvote = async (id: string) => {
+    setActionError("");
+    try { await runAction("toggleUpvote", { ideaId: id }); await refresh(); }
+    catch (cause) { setActionError(cause instanceof Error ? cause.message : "操作失败"); }
   };
 
-  const handleAddIdea = (idea: Idea) => {
-    setIdeas((prev) => [idea, ...prev]);
-    setShowNew(false);
+  const handleAddIdea = async (idea: Idea) => {
+    setActionError("");
+    try { await runAction("createIdea", idea); setShowNew(false); await refresh(); }
+    catch (cause) { setActionError(cause instanceof Error ? cause.message : "提交失败"); }
   };
 
-  const handleAddComment = (ideaId: string, comment: IdeaComment) => {
-    setComments((prev) => [...prev, comment]);
+  const handleAddComment = async (ideaId: string, comment: IdeaComment) => {
+    setActionError("");
+    try { await runAction("addComment", { ideaId, body: comment.body, anonymous: comment.anonymous }); await refresh(); }
+    catch (cause) { setActionError(cause instanceof Error ? cause.message : "评论失败"); }
   };
 
   return (
-    <div className="px-10 py-10 max-w-4xl">
+    <div className="page-shell max-w-4xl">
       {/* Header */}
-      <div className="rise rise-1 flex items-end justify-between mb-3">
+      <div className="rise rise-1 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end mb-3">
         <div>
           <div className="meta">IDEAS · 创意点子库</div>
           <h1 className="display text-4xl mt-2">创意点子库</h1>
@@ -67,6 +75,7 @@ export default function IdeasPage() {
       </div>
 
       <hr className="border-t rule my-8" />
+      {actionError && <div className="mb-5"><SectionError message={actionError} /></div>}
 
       {/* Filters */}
       <div className="rise rise-2 flex items-center justify-between mb-8 gap-4 flex-wrap">
@@ -93,7 +102,7 @@ export default function IdeasPage() {
               className="border rule bg-card transition-all duration-200 rounded-[10px]"
               style={{ borderColor: isExpanded ? "var(--line-strong)" : undefined }}
             >
-              <div className="px-6 py-5">
+              <div className="px-4 py-4 sm:px-6 sm:py-5">
                 <div className="flex items-start justify-between gap-4">
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 mb-2">
@@ -127,7 +136,7 @@ export default function IdeasPage() {
                 {/* Action bar */}
                 <div className="flex items-center gap-5 mt-4 pt-3 border-t rule">
                   <button
-                    onClick={() => handleUpvote(idea.id)}
+                    onClick={() => void handleUpvote(idea.id)}
                     className="flex items-center gap-1.5 text-sm text-ink-soft transition-colors"
                     style={{ background: "none", border: "none", cursor: "pointer" }}
                     onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.color = "var(--ink)")}
@@ -151,7 +160,7 @@ export default function IdeasPage() {
 
               {/* Expanded: comments */}
               {isExpanded && (
-                <div className="px-6 pb-5 border-t rule">
+                <div className="px-4 pb-5 sm:px-6 border-t rule">
                   {ideaComments.length > 0 && (
                     <div className="mt-4 space-y-3">
                       {ideaComments.map((c) => (
@@ -174,9 +183,7 @@ export default function IdeasPage() {
           );
         })}
 
-        {filtered.length === 0 && (
-          <div className="py-16 text-center text-sm text-ink-soft">暂无符合条件的点子，来提交第一个吧</div>
-        )}
+        {filtered.length === 0 && <EmptyState title="没有符合条件的点子" detail="切换分类，或提交第一个想法。" action={<button onClick={() => setShowNew(true)} className="btn-outline px-4 py-2 text-sm">提交点子</button>} />}
       </div>
 
       {showNew && (
@@ -186,14 +193,14 @@ export default function IdeasPage() {
   );
 }
 
-function CommentForm({ ideaId, onSubmit }: { ideaId: string; onSubmit: (id: string, c: IdeaComment) => void }) {
+function CommentForm({ ideaId, onSubmit }: { ideaId: string; onSubmit: (id: string, c: IdeaComment) => Promise<void> }) {
   const [body, setBody] = useState("");
   const [anonymous, setAnonymous] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!body.trim()) return;
-    onSubmit(ideaId, {
+    await onSubmit(ideaId, {
       id: `C-${Date.now()}`,
       ideaId,
       body: body.trim(),
@@ -236,16 +243,16 @@ function CommentForm({ ideaId, onSubmit }: { ideaId: string; onSubmit: (id: stri
   );
 }
 
-function NewIdeaForm({ onSubmit, onCancel }: { onSubmit: (idea: Idea) => void; onCancel: () => void }) {
+function NewIdeaForm({ onSubmit, onCancel }: { onSubmit: (idea: Idea) => Promise<void>; onCancel: () => void }) {
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [category, setCategory] = useState<IdeaCategory>("activity");
   const [anonymous, setAnonymous] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim() || !body.trim()) return;
-    onSubmit({
+    await onSubmit({
       id: `I-${Date.now()}`,
       title: title.trim(),
       body: body.trim(),
@@ -259,20 +266,20 @@ function NewIdeaForm({ onSubmit, onCancel }: { onSubmit: (idea: Idea) => void; o
 
   return (
     <div
-      className="fixed inset-0 backdrop-blur-sm grid place-items-center z-50 px-6"
+      className="modal-backdrop fixed inset-0 backdrop-blur-sm grid place-items-center z-50"
       style={{ background: "rgba(29,29,31,0.4)" }}
       onClick={onCancel}
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="bg-surface border rule max-w-lg w-full"
+        className="modal-panel bg-surface border rule max-w-lg w-full"
         style={{ borderRadius: 16, boxShadow: "var(--shadow-lg)" }}
       >
-        <div className="px-7 py-6 border-b rule">
+        <div className="px-5 sm:px-7 py-5 sm:py-6 border-b rule">
           <div className="meta mb-2">New Idea · 提交点子</div>
           <h3 className="display text-2xl">新创意</h3>
         </div>
-        <form onSubmit={handleSubmit} className="px-7 py-5 space-y-4">
+        <form onSubmit={handleSubmit} className="px-5 sm:px-7 py-5 space-y-4">
           <div>
             <label className="meta text-xs block mb-1">标题</label>
             <input
@@ -294,7 +301,7 @@ function NewIdeaForm({ onSubmit, onCancel }: { onSubmit: (idea: Idea) => void; o
               required
             />
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="meta text-xs block mb-1">分类</label>
               <select

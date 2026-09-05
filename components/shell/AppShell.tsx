@@ -1,32 +1,29 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { TopBar } from "./TopBar";
 import { SideNav } from "./SideNav";
-import { getStoredUser } from "@/lib/auth";
+import { useCurrentUser } from "@/lib/auth";
 
 const PUBLIC_PATHS = ["/login", "/"];
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const [checked, setChecked] = useState(false);
+  const { user, ready } = useCurrentUser();
 
   useEffect(() => {
-    const user = getStoredUser();
-    if (!user && !PUBLIC_PATHS.includes(pathname)) {
+    if (ready && !user && !PUBLIC_PATHS.includes(pathname)) {
       router.replace("/login");
-    } else {
-      setChecked(true);
     }
-  }, [pathname, router]);
+  }, [pathname, ready, router, user]);
 
   if (PUBLIC_PATHS.includes(pathname)) {
     return <>{children}</>;
   }
 
-  if (!checked) {
+  if (!ready || !user) {
     return (
       <div className="min-h-screen grid place-items-center">
         <span className="meta">loading…</span>
@@ -36,10 +33,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <a href="#main-content" className="skip-link">跳到主要内容</a>
       <TopBar />
       <div className="flex-1 flex">
         <SideNav />
-        <main className="flex-1 min-w-0">{children}</main>
+        <main id="main-content" className="flex-1 min-w-0">{children}</main>
       </div>
     </div>
   );

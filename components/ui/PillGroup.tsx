@@ -10,6 +10,7 @@ interface PillGroupProps<T extends string> {
 export function PillGroup<T extends string>({ options, value, onChange }: PillGroupProps<T>) {
   return (
     <div
+      role="group"
       style={{
         display: "inline-flex",
         gap: 2,
@@ -24,7 +25,9 @@ export function PillGroup<T extends string>({ options, value, onChange }: PillGr
         return (
           <button
             key={key}
+            type="button"
             onClick={() => onChange(key)}
+            aria-pressed={active}
             style={{
               fontFamily: "var(--font-sans)",
               fontSize: 13,

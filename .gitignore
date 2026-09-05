@@ -5,6 +5,7 @@ out/
 !.env.example
 .DS_Store
 *.log
+.data/
 
 # TypeScript build cache
 *.tsbuildinfo

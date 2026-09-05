@@ -1,20 +1,20 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { Search, Bell, ChevronDown } from "lucide-react";
-import { getStoredUser, setLocal } from "@/lib/auth";
-import { ROLE_LABEL, type User } from "@/lib/types";
+import { useState } from "react";
+import { usePathname } from "next/navigation";
+import { Search, Bell, ChevronDown, Menu, X } from "lucide-react";
+import { canSeeAdmin, logout, useCurrentUser } from "@/lib/auth";
+import { ROLE_LABEL } from "@/lib/types";
+import { NAV_ITEMS } from "./SideNav";
+
+const ENABLE_GLOBAL_TOOLS = false;
 
 export function TopBar() {
-  const [user, setUser] = useState<User | null>(null);
+  const { user } = useCurrentUser();
   const [menuOpen, setMenuOpen] = useState(false);
-  const router = useRouter();
-
-  useEffect(() => {
-    setUser(getStoredUser());
-  }, []);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const pathname = usePathname();
 
   return (
     <header
@@ -50,11 +50,11 @@ export function TopBar() {
             textDecoration: "none",
           }}
         >
-          创协
+          创客俱乐部
         </Link>
 
         <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
-          <button
+          {ENABLE_GLOBAL_TOOLS && <button
             style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, color: "var(--ink-soft)", background: "none", border: "none", cursor: "pointer", transition: "color 120ms" }}
             aria-label="搜索"
             onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.color = "var(--ink)")}
@@ -62,9 +62,9 @@ export function TopBar() {
           >
             <Search size={15} strokeWidth={1.75} />
             <span className="hidden md:inline">搜索</span>
-          </button>
+          </button>}
 
-          <button
+          {ENABLE_GLOBAL_TOOLS && <button
             style={{ position: "relative", display: "flex", alignItems: "center", gap: 6, fontSize: 13, color: "var(--ink-soft)", background: "none", border: "none", cursor: "pointer", transition: "color 120ms" }}
             aria-label="通知"
             onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.color = "var(--ink)")}
@@ -91,12 +91,14 @@ export function TopBar() {
             >
               3
             </span>
-          </button>
+          </button>}
 
           {user ? (
             <div style={{ position: "relative" }}>
               <button
                 onClick={() => setMenuOpen((v) => !v)}
+                aria-label="打开账户菜单"
+                aria-expanded={menuOpen}
                 style={{ display: "flex", alignItems: "center", gap: 8, background: "none", border: "none", cursor: "pointer" }}
               >
                 <span
@@ -168,7 +170,12 @@ export function TopBar() {
                     个人中心
                   </Link>
                   <button
-                    onClick={() => { setLocal(null); router.push("/login"); }}
+                    onClick={async () => {
+                      await logout();
+                      // Ensure every client-side auth cache is discarded.
+                      // eslint-disable-next-line @next/next/no-location-assign-relative-destination
+                      window.location.assign("/login");
+                    }}
                     style={{
                       display: "block",
                       width: "100%",
@@ -208,8 +215,35 @@ export function TopBar() {
               登录
             </Link>
           )}
+          {user && (
+            <button
+              type="button"
+              className="md:hidden grid h-9 w-9 place-items-center rounded-lg border rule text-ink-soft"
+              onClick={() => setMobileOpen((value) => !value)}
+              aria-label={mobileOpen ? "关闭导航" : "打开导航"}
+              aria-expanded={mobileOpen}
+            >
+              {mobileOpen ? <X size={17} /> : <Menu size={17} />}
+            </button>
+          )}
         </div>
       </div>
+      {user && mobileOpen && (
+        <nav className="absolute left-0 right-0 top-16 z-40 border-b rule bg-surface p-3 shadow-lg md:hidden" aria-label="移动端导航">
+          <div className="grid grid-cols-2 gap-1">
+            {[...NAV_ITEMS, ...(canSeeAdmin(user) ? [{ href: "/admin", label: "Admin", zh: "管理后台" } as const] : [])].map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={() => setMobileOpen(false)}
+                className={`rounded-lg px-3 py-3 text-sm transition-colors ${pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href)) ? "bg-paper-sunken text-ink" : "text-ink-soft hover:bg-paper-sunken"}`}
+              >
+                <span className="meta mr-2 text-[9px]">{item.label}</span>{item.zh}
+              </Link>
+            ))}
+          </div>
+        </nav>
+      )}
     </header>
   );
 }

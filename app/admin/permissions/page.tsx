@@ -28,11 +28,11 @@ export default function AdminPermissionsPage() {
     <div>
       <div className="flex items-baseline justify-between mb-5">
         <h2 className="display text-2xl">权限设置</h2>
-        <button className="px-4 py-2 text-sm border rule hover:border-ink">保存修改</button>
       </div>
-      <p className="meta mb-6">勾选表示该角色拥有对应权限。修改需要社长二次确认。</p>
+      <p className="meta mb-6">当前权限策略由服务端强制执行。需要调整时应通过受审计的配置变更发布。</p>
 
-      <div className="border-t rule">
+      <div className="table-scroll border-t rule">
+        <div className="min-w-[760px]">
         <div className="grid grid-cols-[1fr_1.2fr_repeat(6,56px)] gap-2 py-3 border-b rule">
           <span className="meta">模块</span>
           <span className="meta">说明</span>
@@ -50,15 +50,12 @@ export default function AdminPermissionsPage() {
             <span className="text-ink-soft text-xs">{p.desc}</span>
             {ROLES.map((r) => (
               <span key={r.key} className="text-center">
-                <input
-                  type="checkbox"
-                  defaultChecked={p.roles[r.key]}
-                  className="accent-accent w-4 h-4 cursor-pointer"
-                />
+                <span aria-label={p.roles[r.key] ? "允许" : "不允许"}>{p.roles[r.key] ? "✓" : "—"}</span>
               </span>
             ))}
           </div>
         ))}
+        </div>
       </div>
 
       <div className="mt-6 px-4 py-3 border-l-2 border-rule bg-card/50 text-sm text-ink-soft">

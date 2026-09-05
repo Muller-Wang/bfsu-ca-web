@@ -1,39 +1,62 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import Image from "next/image";
-import { USERS } from "@/lib/mock/users";
-import { setLocal } from "@/lib/auth";
+import { api } from "@/lib/api-client";
 import { ROLE_LABEL } from "@/lib/types";
+import type { User } from "@/lib/types";
 
 export default function LoginPage() {
-  const router = useRouter();
   const [studentId, setStudentId] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [demoUsers, setDemoUsers] = useState<User[]>([]);
 
-  const handleLogin = (e: React.FormEvent) => {
+  useEffect(() => {
+    const presentation = new URLSearchParams(window.location.search).get("presentation") === "1";
+    if (!presentation) return;
+    api<{ demoEnabled: boolean; demoUsers: User[] }>("/api/config?presentation=1")
+      .then((result) => setDemoUsers(result.demoEnabled ? result.demoUsers : []))
+      .catch(() => setDemoUsers([]));
+  }, []);
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    const user = USERS.find((u) => u.id === studentId);
-    if (!user || password.length < 4) {
-      setError("学号或密码错误");
-      return;
+    setError("");
+    setSubmitting(true);
+    try {
+      await api<{ user: User }>("/api/auth/login", {
+        method: "POST",
+        body: JSON.stringify({ id: studentId.trim(), password }),
+      });
+      // A full navigation refreshes the shell's independently loaded session state.
+      // eslint-disable-next-line @next/next/no-location-assign-relative-destination
+      window.location.assign("/dashboard");
+    } catch (loginError) {
+      setError(loginError instanceof Error ? loginError.message : "学号或密码错误");
+    } finally {
+      setSubmitting(false);
     }
-    setLocal(user);
-    router.push("/dashboard");
   };
 
-  const quickLogin = (id: string) => {
-    const user = USERS.find((u) => u.id === id);
-    if (user) {
-      setLocal(user);
-      router.push("/dashboard");
+  const quickLogin = async (id: string) => {
+    setError("");
+    setSubmitting(true);
+    try {
+      await api<{ user: User }>("/api/auth/demo", { method: "POST", body: JSON.stringify({ id }) });
+      // A full navigation refreshes the shell's independently loaded session state.
+      // eslint-disable-next-line @next/next/no-location-assign-relative-destination
+      window.location.assign("/dashboard");
+    } catch (loginError) {
+      setError(loginError instanceof Error ? loginError.message : "演示登录失败");
+    } finally {
+      setSubmitting(false);
     }
   };
 
   return (
-    <div style={{ minHeight: "100vh", display: "flex" }}>
+    <div className="min-h-[100dvh] flex">
       {/* Left — ink panel */}
       <aside
         style={{
@@ -107,7 +130,7 @@ export default function LoginPage() {
               color: "rgba(255,255,255,0.25)",
             }}
           >
-            BFSU Creative Association
+            BFSU Makers Club
             <br />
             Est. 2014 · Internal System
           </div>
@@ -135,12 +158,12 @@ export default function LoginPage() {
 
       {/* Right — form */}
       <main
+        className="px-5 py-10 sm:px-10 sm:py-12"
         style={{
           flex: 1,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          padding: "48px 40px",
           background: "var(--paper)",
         }}
       >
@@ -188,6 +211,10 @@ export default function LoginPage() {
               <input
                 value={studentId}
                 onChange={(e) => setStudentId(e.target.value)}
+                required
+                inputMode="numeric"
+                pattern="[0-9]{11,12}"
+                maxLength={12}
                 style={{
                   width: "100%",
                   background: "transparent",
@@ -200,7 +227,7 @@ export default function LoginPage() {
                   transition: "border-color 150ms",
                   boxSizing: "border-box",
                 }}
-                placeholder="23110301001"
+                placeholder="请输入 11 或 12 位学号"
                 autoComplete="username"
                 onFocus={(e) => (e.currentTarget.style.borderColor = "var(--ink)")}
                 onBlur={(e) => (e.currentTarget.style.borderColor = "var(--line)")}
@@ -225,6 +252,7 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 type="password"
+                required
                 style={{
                   width: "100%",
                   background: "transparent",
@@ -245,11 +273,12 @@ export default function LoginPage() {
             </div>
 
             {error && (
-              <div style={{ fontSize: 14, color: "var(--color-danger)" }}>{error}</div>
+              <div role="alert" aria-live="polite" style={{ fontSize: 14, color: "var(--color-danger)" }}>{error}</div>
             )}
 
             <button
               type="submit"
+              disabled={submitting}
               style={{
                 marginTop: 8,
                 height: "2.8rem",
@@ -267,10 +296,12 @@ export default function LoginPage() {
               onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.opacity = "0.8")}
               onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.opacity = "1")}
             >
-              登 录
+              {submitting ? "登录中…" : "登 录"}
             </button>
           </form>
 
+          {/* 仅 DEMO_MODE=1 且显式进入 /login?presentation=1 时渲染。 */}
+          {demoUsers.length > 0 && (
           <div
             style={{
               marginTop: 40,
@@ -291,9 +322,10 @@ export default function LoginPage() {
               Demo · 快速切换角色
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-              {USERS.slice(0, 5).map((u) => (
+              {demoUsers.map((u) => (
                 <button
                   key={u.id}
+                  type="button"
                   onClick={() => quickLogin(u.id)}
                   style={{
                     textAlign: "left",
@@ -331,6 +363,7 @@ export default function LoginPage() {
               ))}
             </div>
           </div>
+          )}
         </div>
       </main>
     </div>

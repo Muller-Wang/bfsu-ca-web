@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { TASKS } from "@/lib/mock/data";
-import { findUser } from "@/lib/mock/users";
-import { TASK_CADENCE_LABEL, TASK_STATUS_LABEL, type Task, type TaskCadence, type TaskStatus } from "@/lib/types";
+import { TASK_CADENCE_LABEL, TASK_STATUS_LABEL, type Task, type TaskCadence, type TaskStatus, type User } from "@/lib/types";
 import { PillGroup } from "@/components/ui/PillGroup";
+import { parseLocalDate } from "@/lib/date";
+import { runAction, useClubData } from "@/lib/club-data";
+import { useCurrentUser } from "@/lib/auth";
+import { EmptyState, PageError, PageLoading } from "@/components/ui/PageState";
 
 const COLUMNS: { key: TaskStatus; label: string }[] = [
   { key: "todo",   label: "待办" },
@@ -22,8 +24,8 @@ const CADENCE_FILTERS = [
 ] as const;
 
 function isUrgent(ddl: string) {
-  const d = new Date(ddl).getTime();
-  const today = new Date("2026-05-21").getTime();
+  const d = parseLocalDate(ddl).getTime();
+  const today = new Date().setHours(0, 0, 0, 0);
   return d - today < 24 * 3600 * 1000 * 2 && d >= today;
 }
 
@@ -32,24 +34,31 @@ export default function TasksPage() {
   const [dept, setDept] = useState<string>("all");
   const [owner, setOwner] = useState<string>("all");
   const [cadence, setCadence] = useState<TaskCadence | "all">("all");
+  const [showNew, setShowNew] = useState(false);
+  const { user: currentUser } = useCurrentUser();
+  const { data, loading, error, refresh } = useClubData();
+  if (loading && !data) return <PageLoading label="正在加载任务" />;
+  if (error && !data) return <PageError message={error} onRetry={() => void refresh()} />;
+  if (!data) return null;
+  const { tasks, users } = data;
 
-  const filtered = TASKS
+  const filtered = tasks
     .filter((t) => dept === "all" || t.department === dept)
     .filter((t) => owner === "all" || t.assignee === owner)
     .filter((t) => cadence === "all" || t.cadence === cadence);
 
-  const departments = Array.from(new Set(TASKS.map((t) => t.department)));
-  const owners = Array.from(new Set(TASKS.map((t) => t.assignee)));
+  const departments = Array.from(new Set(tasks.map((t) => t.department)));
+  const owners = Array.from(new Set(tasks.map((t) => t.assignee)));
 
   return (
-    <div className="px-10 py-10 max-w-[1400px]">
+    <div className="page-shell max-w-[1400px]">
       {/* Header */}
-      <div className="rise rise-1 flex items-end justify-between mb-3">
+      <div className="rise rise-1 flex items-end justify-between gap-4 mb-3">
         <div>
           <div className="meta">TASKS · 任务看板</div>
           <h1 className="display text-4xl mt-2">任务</h1>
         </div>
-        <button className="btn-outline px-4 h-8 text-sm">+ 新建任务</button>
+        {currentUser && ["president", "vice_president", "secretary", "head"].includes(currentUser.role) && <button onClick={() => setShowNew(true)} className="btn-outline px-4 h-8 text-sm">+ 新建任务</button>}
       </div>
 
       {/* Toolbar */}
@@ -78,12 +87,12 @@ export default function TasksPage() {
         >
           <option value="all">人员 · 全部</option>
           {owners.map((id) => {
-            const u = findUser(id);
+            const u = users.find((user) => user.id === id);
             return <option key={id} value={id}>{u?.name}</option>;
           })}
         </select>
 
-        <div className="ml-auto">
+        <div className="w-full overflow-x-auto sm:ml-auto sm:w-auto">
           <PillGroup
             options={CADENCE_FILTERS as unknown as { key: TaskCadence | "all"; label: string }[]}
             value={cadence}
@@ -92,12 +101,13 @@ export default function TasksPage() {
         </div>
       </div>
 
-      {view === "board" ? <BoardView tasks={filtered} /> : <ListView tasks={filtered} />}
+      {filtered.length === 0 ? <EmptyState title="没有匹配的任务" detail="调整筛选条件，或创建一项新任务。" /> : view === "board" ? <BoardView tasks={filtered} users={users} /> : <ListView tasks={filtered} users={users} />}
+      {showNew && <TaskForm users={users} onCancel={() => setShowNew(false)} onSaved={async () => { setShowNew(false); await refresh(); }} />}
     </div>
   );
 }
 
-function BoardView({ tasks }: { tasks: Task[] }) {
+function BoardView({ tasks, users }: { tasks: Task[]; users: User[] }) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 rise rise-3">
       {COLUMNS.map((col) => {
@@ -109,7 +119,7 @@ function BoardView({ tasks }: { tasks: Task[] }) {
               <span className="meta">{String(list.length).padStart(2, "0")}</span>
             </div>
             <div className="space-y-3">
-              {list.map((t) => <TaskCard key={t.id} task={t} />)}
+              {list.map((t) => <TaskCard key={t.id} task={t} users={users} />)}
               {list.length === 0 && (
                 <div className="meta text-center py-6 border border-dashed rule">空</div>
               )}
@@ -121,12 +131,12 @@ function BoardView({ tasks }: { tasks: Task[] }) {
   );
 }
 
-function TaskCard({ task }: { task: Task }) {
-  const assignee = findUser(task.assignee);
+function TaskCard({ task, users }: { task: Task; users: User[] }) {
+  const assignee = users.find((user) => user.id === task.assignee);
   const urgent = isUrgent(task.ddl) && task.status !== "done";
   const isRecurring = task.cadence !== "once";
   return (
-    <article className="bg-card border rule rounded-[10px] p-3.5 hover:border-ink transition-colors cursor-pointer">
+    <article className="bg-card border rule rounded-[10px] p-3.5 hover:border-ink transition-colors">
       <div className="flex items-start justify-between gap-2 mb-2">
         <div className="flex items-center gap-1.5">
           <span className="meta">{task.id}</span>
@@ -186,17 +196,18 @@ function TaskCard({ task }: { task: Task }) {
   );
 }
 
-function ListView({ tasks }: { tasks: Task[] }) {
+function ListView({ tasks, users }: { tasks: Task[]; users: User[] }) {
   const sorted = [...tasks].sort((a, b) => a.ddl.localeCompare(b.ddl));
   return (
-    <div className="rise rise-3 border-t rule">
+    <div className="table-scroll rise rise-3 border-t rule">
+      <div className="min-w-[820px]">
       <div className="grid grid-cols-[100px_1fr_120px_100px_80px_80px_70px] gap-4 items-center py-3 border-b rule px-2">
         {["ID", "任务", "部门", "DDL", "负责人", "状态", "周期"].map((h) => (
           <span key={h} className="meta">{h}</span>
         ))}
       </div>
       {sorted.map((t) => {
-        const assignee = findUser(t.assignee);
+        const assignee = users.find((user) => user.id === t.assignee);
         return (
           <div
             key={t.id}
@@ -221,6 +232,36 @@ function ListView({ tasks }: { tasks: Task[] }) {
           </div>
         );
       })}
+      </div>
+    </div>
+  );
+}
+
+function TaskForm({ users, onCancel, onSaved }: { users: User[]; onCancel: () => void; onSaved: () => void }) {
+  const [form, setForm] = useState({ title: "", department: users[0]?.department || "秘书处", ddl: new Date().toISOString().slice(0, 10), assignee: users[0]?.id || "", cadence: "once" as TaskCadence });
+  const [error, setError] = useState("");
+  const submit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    try { await runAction("createTask", { ...form, status: "todo", progress: 0 }); onSaved(); }
+    catch (cause) { setError(cause instanceof Error ? cause.message : "创建失败"); }
+  };
+  return (
+    <div className="modal-backdrop fixed inset-0 bg-ink/40 backdrop-blur-sm grid place-items-center z-50" onClick={onCancel}>
+      <form onSubmit={submit} onClick={(e) => e.stopPropagation()} className="modal-panel bg-card border rule rounded-xl max-w-lg w-full p-5 sm:p-7 space-y-4">
+        <h2 className="display text-2xl">新建任务</h2>
+        <input required value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="任务名称" className="w-full bg-transparent border-b rule py-2 outline-none" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <select value={form.department} onChange={(e) => setForm({ ...form, department: e.target.value as User["department"] })} className="bg-transparent border-b rule py-2">
+            {[...new Set(users.map((user) => user.department))].map((item) => <option key={item}>{item}</option>)}
+          </select>
+          <input type="date" required value={form.ddl} onChange={(e) => setForm({ ...form, ddl: e.target.value })} className="bg-transparent border-b rule py-2" />
+        </div>
+        <select value={form.assignee} onChange={(e) => setForm({ ...form, assignee: e.target.value })} className="w-full bg-transparent border-b rule py-2">
+          {users.map((user) => <option key={user.id} value={user.id}>{user.name} · {user.department}</option>)}
+        </select>
+        {error && <p className="text-danger text-sm">{error}</p>}
+        <div className="flex justify-end gap-3"><button type="button" onClick={onCancel}>取消</button><button type="submit" className="btn-outline px-4 py-2">创建</button></div>
+      </form>
     </div>
   );
 }

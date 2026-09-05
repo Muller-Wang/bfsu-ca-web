@@ -1,34 +1,34 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { getStoredUser } from "@/lib/auth";
-import { ANNOUNCEMENTS, EVENTS, FEED, TASKS } from "@/lib/mock/data";
-import { EVENT_TAG_META, TASK_STATUS_LABEL, type User } from "@/lib/types";
-
-const WEEKDAYS = ["日", "一", "二", "三", "四", "五", "六"];
-
-function formatChineseDate(d: Date) {
-  return `${d.getFullYear()} 年 ${d.getMonth() + 1} 月 ${d.getDate()} 日 · 星期${WEEKDAYS[d.getDay()]}`;
-}
+import { useCurrentUser } from "@/lib/auth";
+import { useClubData } from "@/lib/club-data";
+import { parseLocalDate } from "@/lib/date";
+import { EVENT_TAG_META, TASK_STATUS_LABEL } from "@/lib/types";
+import { EmptyState, PageError, PageLoading } from "@/components/ui/PageState";
 
 function formatEnDate(d: Date) {
   return d.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }).toUpperCase();
 }
 
 export default function DashboardPage() {
-  const [user, setUser] = useState<User | null>(null);
-  const today = new Date("2026-05-21");
+  const { user } = useCurrentUser();
+  const { data, loading, error, refresh } = useClubData();
+  const today = new Date();
+  const todayIso = today.toISOString().slice(0, 10);
+  if (loading && !data) return <PageLoading label="正在加载主页" />;
+  if (error && !data) return <PageError message={error} onRetry={() => void refresh()} />;
+  if (!data) return null;
+  const { events, feed, tasks } = data;
+  const announcements = data.announcements.filter((item) => item.pinned);
 
-  useEffect(() => {
-    setUser(getStoredUser());
-  }, []);
-
-  const upcoming = EVENTS.filter((e) => e.date >= "2026-05-21" && e.tag !== "ddl").slice(0, 3);
-  const myTasks = TASKS.filter((t) => t.assignee === (user?.id || "23110301007") && t.status !== "done").slice(0, 3);
+  const upcoming = events.filter((e) => e.date >= todayIso && e.tag !== "ddl").slice(0, 3);
+  const myTasks = tasks.filter((t) => t.assignee === user?.id && t.status !== "done").slice(0, 3);
+  const weekEnd = new Date(today); weekEnd.setDate(today.getDate() + 7);
+  const thisWeekCount = events.filter((event) => event.date >= todayIso && parseLocalDate(event.date) <= weekEnd && event.tag !== "ddl").length;
 
   return (
-    <div className="px-10 py-10 max-w-6xl">
+    <div className="page-shell max-w-6xl">
       {/* Hero strip */}
       <div className="rise rise-1">
         <div className="meta">{formatEnDate(today)}</div>
@@ -37,7 +37,7 @@ export default function DashboardPage() {
         </h1>
         <p className="text-ink-soft mt-2 text-base">
           今天有 <span className="text-ink font-mono">{myTasks.length}</span> 项待办，本周还有{" "}
-          <span className="text-ink font-mono">2</span> 场活动。
+          <span className="text-ink font-mono">{thisWeekCount}</span> 场活动。
         </p>
       </div>
 
@@ -47,10 +47,10 @@ export default function DashboardPage() {
       <section className="rise rise-2">
         <div className="flex items-baseline justify-between mb-5">
           <h2 className="display text-2xl">置顶公告</h2>
-          <span className="meta">PINNED · {ANNOUNCEMENTS.length}</span>
+          <span className="meta">PINNED · {announcements.length}</span>
         </div>
-        <ul className="space-y-5">
-          {ANNOUNCEMENTS.map((a) => (
+        {announcements.length ? <ul className="space-y-5">
+          {announcements.map((a) => (
             <li key={a.id} className="grid grid-cols-[auto_1fr] gap-5">
               <span className="meta pt-1">#{a.id}</span>
               <div>
@@ -68,7 +68,7 @@ export default function DashboardPage() {
               </div>
             </li>
           ))}
-        </ul>
+        </ul> : <EmptyState title="暂无置顶公告" detail="管理员发布并置顶公告后，会显示在这里。" />}
       </section>
 
       <hr className="border-t rule my-10" />
@@ -80,10 +80,10 @@ export default function DashboardPage() {
             <h2 className="display text-2xl">近期活动</h2>
             <span className="meta">UPCOMING</span>
           </div>
-          <ul className="space-y-5">
+          {upcoming.length ? <ul className="space-y-5">
             {upcoming.map((ev) => {
               const meta = EVENT_TAG_META[ev.tag];
-              const d = new Date(ev.date);
+              const d = parseLocalDate(ev.date);
               return (
                 <li key={ev.id} className="grid grid-cols-[auto_1fr] gap-4">
                   <div className="text-right">
@@ -107,7 +107,7 @@ export default function DashboardPage() {
                 </li>
               );
             })}
-          </ul>
+          </ul> : <EmptyState title="近期没有活动" detail="新的活动安排会自动进入这一区域。" />}
           <Link
             href="/calendar"
             className="meta mt-6 inline-flex items-center gap-2 hover:text-accent"
@@ -121,7 +121,7 @@ export default function DashboardPage() {
             <h2 className="display text-2xl">我的待办</h2>
             <span className="meta">MY TASKS</span>
           </div>
-          <ul className="space-y-5">
+          {myTasks.length ? <ul className="space-y-5">
             {myTasks.map((t) => (
               <li key={t.id} className="border-b rule pb-4">
                 <div className="flex items-baseline justify-between">
@@ -151,7 +151,7 @@ export default function DashboardPage() {
                 <div className="meta mt-1.5 text-accent">{TASK_STATUS_LABEL[t.status]}</div>
               </li>
             ))}
-          </ul>
+          </ul> : <EmptyState title="当前没有待办" detail="分配给你的新任务会显示在这里。" />}
           <Link href="/tasks" className="meta mt-4 inline-flex items-center gap-2 hover:text-accent">
             查看全部 →
           </Link>
@@ -166,15 +166,15 @@ export default function DashboardPage() {
           <h2 className="display text-2xl">社团动态</h2>
           <span className="meta">ACTIVITY FEED</span>
         </div>
-        <ul className="space-y-2.5">
-          {FEED.map((f) => (
+        {feed.length ? <ul className="space-y-2.5">
+          {feed.map((f) => (
             <li key={f.id} className="grid grid-cols-[auto_auto_1fr] gap-x-4 items-baseline">
               <span className="meta">{f.at.slice(5)}</span>
               <span className="text-sm text-ink">{f.who}</span>
               <span className="text-sm text-ink-soft">{f.what}</span>
             </li>
           ))}
-        </ul>
+        </ul> : <EmptyState title="暂无动态" detail="创建任务、发布公告等操作会形成动态记录。" />}
       </section>
 
       <div className="h-20" />

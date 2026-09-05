@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { TEMPLATES } from "@/lib/mock/data";
-import { TEMPLATE_CATEGORY_LABEL, type Template, type TemplateCategory } from "@/lib/types";
+import { TEMPLATE_CATEGORY_LABEL, type Template } from "@/lib/types";
 import { PillGroup } from "@/components/ui/PillGroup";
+import { runAction, useClubData } from "@/lib/club-data";
+import { EmptyState, SectionError, SectionLoading } from "@/components/ui/PageState";
 
 const EXT_BADGE: Record<string, string> = {
   docx: "DOC",
@@ -13,29 +14,47 @@ const EXT_BADGE: Record<string, string> = {
 };
 
 export default function AdminTemplatesPage() {
-  const [templates, setTemplates] = useState<Template[]>(TEMPLATES);
   const [editing, setEditing] = useState<Template | null>(null);
   const [showNew, setShowNew] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState<Template | null>(null);
+  const [uploadError, setUploadError] = useState("");
+  const [actionError, setActionError] = useState("");
+  const { data, loading, error, refresh } = useClubData();
+  if (loading && !data) return <SectionLoading label="正在加载模板" />;
+  if (error && !data) return <SectionError message={error} onRetry={() => void refresh()} />;
+  if (!data) return null;
+  const templates = data.templates;
 
-  const handleSave = (form: Template) => {
-    if (editing) {
-      setTemplates((prev) => prev.map((t) => (t.id === form.id ? form : t)));
+  const handleSave = async (form: Template) => {
+    setActionError("");
+    try {
+      await runAction("saveTemplate", form);
       setEditing(null);
-    } else {
-      setTemplates((prev) => [...prev, form]);
       setShowNew(false);
-    }
+      await refresh();
+    } catch (cause) { setActionError(cause instanceof Error ? cause.message : "保存失败"); }
   };
 
-  const handleDelete = (tp: Template) => {
-    setTemplates((prev) => prev.filter((t) => t.id !== tp.id));
-    setConfirmDelete(null);
+  const handleDelete = async (tp: Template) => {
+    setActionError("");
+    try {
+      await runAction("deleteTemplate", { id: tp.id });
+      setConfirmDelete(null);
+      await refresh();
+    } catch (cause) { setActionError(cause instanceof Error ? cause.message : "删除失败"); }
+  };
+
+  const uploadFile = async (template: Template, file: File) => {
+    const body = new FormData(); body.append("file", file);
+    const response = await fetch(`/api/templates/${template.id}/file`, { method: "POST", body });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok) { setUploadError(result.error || "上传失败"); return; }
+    setUploadError(""); await refresh();
   };
 
   return (
     <div>
-      <div className="flex items-baseline justify-between mb-5">
+      <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-baseline mb-5">
         <h2 className="display text-2xl">模板管理</h2>
         <button
           onClick={() => setShowNew(true)}
@@ -45,9 +64,12 @@ export default function AdminTemplatesPage() {
         </button>
       </div>
       <p className="meta mb-6">管理资料库中所有模板文件。修改后所有用户立即可见。</p>
+      {uploadError && <p className="text-danger text-sm mb-4">{uploadError}</p>}
+      {actionError && <div className="mb-4"><SectionError message={actionError} /></div>}
 
-      <div className="border-t rule">
-        <div className="grid grid-cols-[1.2fr_100px_80px_80px_80px_100px_140px] gap-3 py-3 border-b rule">
+      <div className="table-scroll border-t rule">
+        <div className="min-w-[880px]">
+        <div className="grid grid-cols-[1.2fr_100px_80px_80px_80px_100px_200px] gap-3 py-3 border-b rule">
           {["模板名称", "英文名", "类型", "版本", "分类", "更新日期", "操作"].map((h) => (
             <span key={h} className="meta">{h}</span>
           ))}
@@ -56,7 +78,7 @@ export default function AdminTemplatesPage() {
         {templates.map((tp) => (
           <div
             key={tp.id}
-            className="grid grid-cols-[1.2fr_100px_80px_80px_80px_100px_140px] gap-3 py-3 border-b rule items-center text-sm hover:bg-card/60"
+            className="grid grid-cols-[1.2fr_100px_80px_80px_80px_100px_200px] gap-3 py-3 border-b rule items-center text-sm hover:bg-card/60"
           >
             <span>
               <span className="font-mono text-[10px] border rule px-1.5 py-0.5 mr-2">{EXT_BADGE[tp.ext]}</span>
@@ -80,15 +102,23 @@ export default function AdminTemplatesPage() {
               >
                 删除
               </button>
+              <label className="border-b rule hover:border-ink cursor-pointer">
+                上传文件
+                <input type="file" accept=".docx,.pdf,.md,.xlsx" className="sr-only" onChange={(event) => { const file = event.target.files?.[0]; if (file) void uploadFile(tp, file); }} />
+              </label>
+              {tp.downloadUrl && <a href={tp.downloadUrl} className="border-b rule hover:border-ink">下载</a>}
             </span>
           </div>
         ))}
+        </div>
       </div>
+      {templates.length === 0 && <EmptyState title="暂无模板" detail="创建模板元数据后，可以继续上传对应文件。" />}
 
       {/* Edit / New modal */}
       {(editing || showNew) && (
         <TemplateForm
           initial={editing}
+          existingIds={templates.map((t) => t.id)}
           onSave={handleSave}
           onCancel={() => { setEditing(null); setShowNew(false); }}
         />
@@ -97,12 +127,12 @@ export default function AdminTemplatesPage() {
       {/* Delete confirmation */}
       {confirmDelete && (
         <div
-          className="fixed inset-0 bg-ink/40 backdrop-blur-sm grid place-items-center z-50 px-6"
+          className="modal-backdrop fixed inset-0 bg-ink/40 backdrop-blur-sm grid place-items-center z-50"
           onClick={() => setConfirmDelete(null)}
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="bg-card border rule rounded-sm max-w-md w-full shadow-2xl"
+            className="modal-panel bg-card border rule rounded-sm max-w-md w-full shadow-2xl"
           >
             <div className="px-7 py-6 border-b rule">
               <div className="meta text-danger mb-2">⚠ 删除模板</div>
@@ -116,7 +146,7 @@ export default function AdminTemplatesPage() {
                 取消
               </button>
               <button
-                onClick={() => handleDelete(confirmDelete)}
+                onClick={() => void handleDelete(confirmDelete)}
                 className="text-sm px-4 py-2 btn-outline-danger"
               >
                 确认删除
@@ -131,16 +161,26 @@ export default function AdminTemplatesPage() {
 
 function TemplateForm({
   initial,
+  existingIds,
   onSave,
   onCancel,
 }: {
   initial: Template | null;
-  onSave: (t: Template) => void;
+  existingIds: string[];
+  onSave: (t: Template) => Promise<void>;
   onCancel: () => void;
 }) {
+  const nextId = () => {
+    const nums = existingIds
+      .map((id) => parseInt(id.replace(/^TP-/, ""), 10))
+      .filter(Number.isFinite);
+    const max = nums.length ? Math.max(...nums) : 0;
+    return `TP-${String(max + 1).padStart(2, "0")}`;
+  };
+
   const [form, setForm] = useState<Template>(
     initial || {
-      id: `TP-${String(Math.floor(Math.random() * 100)).padStart(2, "0")}`,
+      id: nextId(),
       name: "",
       nameEn: "",
       ext: "docx",
@@ -151,26 +191,26 @@ function TemplateForm({
     }
   );
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onSave(form);
+    await onSave(form);
   };
 
   return (
     <div
-      className="fixed inset-0 bg-ink/40 backdrop-blur-sm grid place-items-center z-50 px-6"
+      className="modal-backdrop fixed inset-0 bg-ink/40 backdrop-blur-sm grid place-items-center z-50"
       onClick={onCancel}
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="bg-card border rule rounded-sm max-w-lg w-full shadow-2xl"
+        className="modal-panel bg-card border rule rounded-sm max-w-lg w-full shadow-2xl"
       >
-        <div className="px-7 py-6 border-b rule">
+        <div className="px-5 sm:px-7 py-5 sm:py-6 border-b rule">
           <div className="meta mb-2">{initial ? "编辑模板" : "新增模板"}</div>
           <h3 className="display text-2xl">{initial ? initial.name : "新建模板"}</h3>
         </div>
-        <form onSubmit={handleSubmit} className="px-7 py-5 space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+        <form onSubmit={handleSubmit} className="px-5 sm:px-7 py-5 space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="meta text-xs block mb-1">中文名称</label>
               <input
@@ -190,7 +230,7 @@ function TemplateForm({
               />
             </div>
           </div>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
               <label className="meta text-xs block mb-1">文件类型</label>
               <select

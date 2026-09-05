@@ -26,8 +26,15 @@ const mono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "创协 BFSU · Creative Association",
-  description: "北京外国语大学创协内部管理系统",
+  title: "北外创客俱乐部 · BFSU Makers Club",
+  description: "北京外国语大学创客俱乐部内部管理系统",
+  icons: { icon: "/bfsu-badge.png", apple: "/bfsu-badge.png" },
+  openGraph: {
+    title: "北外创客俱乐部",
+    description: "创意，在北外。",
+    type: "website",
+    locale: "zh_CN",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
