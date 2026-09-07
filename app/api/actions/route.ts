@@ -9,7 +9,7 @@ import { assertSameOrigin } from "@/lib/server/request";
 
 const Envelope = z.object({ action: z.string(), payload: z.record(z.string(), z.unknown()).default({}) });
 const Role = z.enum(["president", "vice_president", "secretary", "head", "member", "probation"]);
-const Department = z.enum(["社长办", "秘书处", "外联部", "学术部", "宣传部", "日语部", "德语部"]);
+const Department = z.enum(["社长办", "秘书处", "外联部", "学术部", "宣传部"]);
 const AdminRoles = ["president", "vice_president", "secretary"] as const;
 
 function badRequest(error: unknown) {

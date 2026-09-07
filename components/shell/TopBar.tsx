@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { ClubBrand } from "@/components/brand/ClubBrand";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { Search, Bell, ChevronDown, Menu, X } from "lucide-react";
@@ -50,7 +51,7 @@ export function TopBar() {
             textDecoration: "none",
           }}
         >
-          创客俱乐部
+          <ClubBrand compact />
         </Link>
 
         <div style={{ display: "flex", alignItems: "center", gap: 18 }}>

@@ -213,7 +213,7 @@ export default function AdminMembersPage() {
 
 /* ── 添加成员表单 ── */
 
-const DEPARTMENTS: Department[] = ["社长办", "秘书处", "外联部", "学术部", "宣传部", "日语部", "德语部"];
+const DEPARTMENTS: Department[] = ["社长办", "秘书处", "外联部", "学术部", "宣传部"];
 
 const ROLE_OPTIONS: Role[] = ["member", "probation", "head", "secretary", "vice_president", "president"];
 

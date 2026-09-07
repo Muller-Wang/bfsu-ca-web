@@ -27,6 +27,7 @@ export function SideNav() {
       <Link
         key={href}
         href={href}
+        aria-current={active ? "page" : undefined}
         style={{
           display: "flex",
           alignItems: "baseline",
@@ -34,8 +35,8 @@ export function SideNav() {
           padding: "8px 12px",
           borderRadius: 8,
           textDecoration: "none",
-          background: active ? "var(--paper-sunken)" : "transparent",
-          color: active ? "var(--ink)" : "var(--ink-soft)",
+          background: active ? "var(--color-accent-wash)" : "transparent",
+          color: active ? "var(--color-accent)" : "var(--ink-soft)",
           fontWeight: active ? 500 : 400,
           transition: "background 120ms, color 120ms",
         }}

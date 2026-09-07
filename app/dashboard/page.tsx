@@ -30,10 +30,11 @@ export default function DashboardPage() {
   return (
     <div className="page-shell max-w-6xl">
       {/* Hero strip */}
-      <div className="rise rise-1">
+      <div className="club-dashboard-intro">
+        <div className="club-dashboard-geometry" aria-hidden="true"><i /><i /><i /></div>
         <div className="meta">{formatEnDate(today)}</div>
         <h1 className="display text-4xl md:text-5xl mt-3">
-          早上好，<span className="italic font-serif">{user?.name || "墨乐"}</span>。
+          你好，<span>{user?.name || "创客伙伴"}</span>。
         </h1>
         <p className="text-ink-soft mt-2 text-base">
           今天有 <span className="text-ink font-mono">{myTasks.length}</span> 项待办，本周还有{" "}

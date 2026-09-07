@@ -1,5 +1,64 @@
 @import "tailwindcss";
 
+[data-theme="bauhaus"] {
+  --color-paper: #f7f6f2; --color-paper-sunken: #eeede7;
+  --color-surface: #fffefa; --color-surface-2: #f2f1eb;
+  --color-ink: #252521; --color-ink-soft: #66665e;
+  --color-ink-mute: #77766e; --color-ink-faint: #929187;
+  --color-line: #dad9d1; --color-line-strong: #bdbcb2; --color-line-faint: #e7e6de;
+  --color-accent: #bd4632; --color-accent-soft: #a53c2b; --color-accent-wash: #f4e6de;
+  --paper: var(--color-paper); --paper-sunken: var(--color-paper-sunken);
+  --surface: var(--color-surface); --ink: var(--color-ink); --ink-soft: var(--color-ink-soft);
+  --ink-mute: var(--color-ink-mute); --ink-faint: var(--color-ink-faint);
+  --line: var(--color-line); --line-faint: var(--color-line-faint);
+  --bfsu-indigo: var(--color-accent); --on-dark: #f7f6f2; --on-dark-soft: #bab9af;
+}
+.club-logo { object-fit: contain; flex-shrink: 0; border-radius: 4px; }
+.club-page-enter { animation: club-enter .35s ease-out both; }
+@keyframes club-enter { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.club-dashboard-intro { position: relative; isolation: isolate; background: var(--paper-sunken); padding: 36px; overflow: hidden; }
+.club-dashboard-intro h1, .club-dashboard-intro p, .club-dashboard-intro > .meta { position: relative; z-index: 1; max-width: calc(100% - 160px); }
+.club-dashboard-geometry { position: absolute; right: 30px; top: 30px; width: 130px; height: 130px; }
+.club-dashboard-geometry i { position: absolute; display: block; }
+.club-dashboard-geometry i:first-child { width: 68px; height: 68px; border-radius: 50%; background: var(--color-accent); left: 0; top: 0; }
+.club-dashboard-geometry i:nth-child(2) { width: 44px; height: 120px; border-radius: 44px 44px 0 0; background: var(--ink); right: 0; top: 0; }
+.club-dashboard-geometry i:last-child { width: 68px; height: 40px; bottom: 10px; background: repeating-linear-gradient(90deg,var(--ink) 0 1px,transparent 1px 7px); }
+@media(max-width: 900px) { .club-dashboard-geometry { display: none; } .club-dashboard-intro h1, .club-dashboard-intro p, .club-dashboard-intro > .meta { max-width: none; } .club-dashboard-intro { padding: 24px; } }
+@media(prefers-reduced-motion: reduce) { .club-page-enter { animation: none; } }
+.club-brand { display: inline-flex; align-items: center; gap: 13px; font-size: 19px; font-weight: 600; letter-spacing: -.035em; white-space: nowrap; }
+.club-brand small { display: block; margin-top: 5px; font: 9px var(--font-mono); letter-spacing: .14em; }
+.club-brand-compact { font-size: 16px; gap: 10px; }
+.club-brand-compact small { font-size: 7px; }
+.club-public-nav { display: flex; align-items: center; gap: 30px; font-size: 12px; }
+.club-public-nav a:hover { color: var(--color-accent); }
+[data-theme="bauhaus"] .page-shell { max-width: 1320px; margin-inline: auto; padding: clamp(24px, 4vw, 64px); }
+[data-theme="bauhaus"] .display { font-weight: 500; line-height: 1.25; letter-spacing: -.045em; text-wrap: balance; }
+[data-theme="bauhaus"] :focus-visible { outline-color: var(--color-accent); }
+.club-login { min-height: 100dvh; background: var(--paper); padding: 0 5%; }
+.club-login-header { max-width: 1100px; margin: auto; padding: 26px 0; }
+.club-login-header a { text-decoration: none; }
+.club-login-layout { max-width: 1100px; margin: 10px auto 60px; display: grid; grid-template-columns: 1fr 1fr; border-block: 1px solid var(--line); }
+.club-login-art { background: var(--paper-sunken); }
+.club-login-motto { padding: 24px 40px 48px; font-size: 28px; line-height: 1.5; letter-spacing: -.04em; }
+.club-login-form { padding: 54px 60px; }
+.club-login-form h1 { margin: 18px 0 12px; font-size: 38px; font-weight: 500; letter-spacing: -.05em; }
+.club-login-form > p { color: var(--ink-soft); font-size: 13px; }
+.club-login-form form { display: grid; gap: 26px; margin-top: 36px; }
+.club-login-form label { display: grid; gap: 12px; font-size: 12px; color: var(--ink-soft); }
+.club-login-form input { width: 100%; background: transparent; border-bottom: 1px solid var(--line); padding: 10px 0; font-size: 16px; color: var(--ink); }
+.club-login-submit { min-height: 48px; padding: 12px 24px; background: var(--ink); color: #fffefa; border-radius: 100px; cursor: pointer; }
+.club-login-submit:hover { background: var(--color-accent); }
+.club-login-submit:disabled { opacity: .55; cursor: wait; }
+.club-demo { margin-top: 32px; border-top: 1px solid var(--line); padding-top: 20px; }
+.club-demo button { display: block; width: 100%; text-align: left; padding: 12px 0; }
+@media(max-width: 700px) {
+  .club-brand { font-size: 16px; gap: 8px; }
+  .club-public-nav { order: 3; width: 100%; justify-content: space-between; gap: 12px; padding: 8px 0; }
+  .club-login-layout { display: block; }
+  .club-login-art { display: none; }
+  .club-login-form { padding: 36px 12px 48px; max-width: 420px; margin: auto; }
+}
+
 @theme {
   /* Brand defaults — 极简黑白 mono palette (active via data-theme="mono") */
   --color-paper:        #F5F5F7;

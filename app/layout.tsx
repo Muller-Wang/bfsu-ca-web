@@ -28,7 +28,7 @@ const mono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "北外创客俱乐部 · BFSU Makers Club",
   description: "北京外国语大学创客俱乐部内部管理系统",
-  icons: { icon: "/bfsu-badge.png", apple: "/bfsu-badge.png" },
+  icons: { icon: "/club-logo.png", apple: "/club-logo.png" },
   openGraph: {
     title: "北外创客俱乐部",
     description: "创意，在北外。",
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="zh-CN" data-theme="mono" className={`${newsreader.variable} ${geist.variable} ${mono.variable}`}>
+    <html lang="zh-CN" data-theme="bauhaus" className={`${newsreader.variable} ${geist.variable} ${mono.variable}`}>
       <body className="antialiased">
         <AppShell>{children}</AppShell>
       </body>

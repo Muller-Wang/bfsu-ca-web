@@ -6,7 +6,7 @@ import { TopBar } from "./TopBar";
 import { SideNav } from "./SideNav";
 import { useCurrentUser } from "@/lib/auth";
 
-const PUBLIC_PATHS = ["/login", "/"];
+const PUBLIC_PATHS = ["/login", "/", "/revised"];
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -37,7 +37,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <TopBar />
       <div className="flex-1 flex">
         <SideNav />
-        <main id="main-content" className="flex-1 min-w-0">{children}</main>
+        <main id="main-content" key={pathname} className="club-page-enter flex-1 min-w-0">{children}</main>
       </div>
     </div>
   );

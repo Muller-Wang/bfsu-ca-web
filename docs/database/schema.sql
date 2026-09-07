@@ -55,7 +55,7 @@ CREATE TYPE idea_category_enum AS ENUM ('activity', 'outreach', 'content', 'inte
 
 -- 部门（小表，name 直接作主键，与现有代码中的中文字符串一致）
 CREATE TABLE departments (
-  name        TEXT PRIMARY KEY,            -- 秘书处 / 外联部 / 学术部 / 宣传部 / 日语部 / 德语部 / 社长办
+  name        TEXT PRIMARY KEY,            -- 四个部门 + 社长办（管理归属，非职能部门）
   sort_order  SMALLINT NOT NULL DEFAULT 0,
   created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 );

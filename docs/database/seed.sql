@@ -12,9 +12,7 @@ INSERT INTO departments (name, sort_order) VALUES
   ('秘书处', 2),
   ('外联部', 3),
   ('学术部', 4),
-  ('宣传部', 5),
-  ('日语部', 6),
-  ('德语部', 7);
+  ('宣传部', 5);
 
 -- 初始系统管理员账号（密码仅以 bcrypt cost 12 哈希保存）
 INSERT INTO users (id, work_no, name, name_en, password_hash, department, role, title, join_date, status)

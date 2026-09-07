@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { jwtVerify } from "jose";
 
 const COOKIE = "bfsu-makers-session";
-const PUBLIC = new Set(["/", "/login"]);
+const PUBLIC = new Set(["/", "/login", "/revised"]);
 const ADMIN_ROLES = new Set(["president", "vice_president", "secretary"]);
 
 async function verify(request: NextRequest) {
