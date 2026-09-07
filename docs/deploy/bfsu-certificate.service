@@ -1,0 +1,7 @@
+[Unit]
+Description=Renew BFSU IP certificate
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/opt/bfsu-makers/certbot/bin/certbot renew --quiet --deploy-hook "/usr/sbin/nginx -t && /usr/bin/systemctl reload nginx"
