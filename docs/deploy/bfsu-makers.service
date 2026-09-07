@@ -1,0 +1,23 @@
+[Unit]
+Description=BFSU Makers Club
+After=network.target postgresql-16.service
+Requires=postgresql-16.service
+
+[Service]
+Type=simple
+User=bfsu
+Group=bfsu
+WorkingDirectory=/opt/bfsu-makers/app
+EnvironmentFile=/etc/bfsu-makers.env
+ExecStart=/opt/bfsu-makers/runtime/node /opt/bfsu-makers/app/node_modules/next/dist/bin/next start -H 127.0.0.1 -p 3100
+Restart=on-failure
+RestartSec=5
+UMask=0027
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+ReadWritePaths=/opt/bfsu-makers/app/.next /var/lib/bfsu-makers
+
+[Install]
+WantedBy=multi-user.target
