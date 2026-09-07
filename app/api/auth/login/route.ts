@@ -26,6 +26,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ user });
   }
 
+  try {
   const sql = db();
   const rows = await sql`
     SELECT id, work_no, name, name_en, department, role, title, join_date, password_hash
@@ -44,4 +45,7 @@ export async function POST(request: Request) {
   };
   await issueSession(user);
   return NextResponse.json({ user });
+  } catch {
+    return NextResponse.json({ error: "数据库暂未就绪，请联系管理员完成配置后再登录" }, { status: 503 });
+  }
 }

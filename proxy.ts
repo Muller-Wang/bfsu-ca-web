@@ -10,7 +10,9 @@ async function verify(request: NextRequest) {
   const secret = process.env.SESSION_SECRET || (process.env.NODE_ENV !== "production" ? "bfsu-makers-club-local-development-secret-only" : "");
   if (!value || !secret) return null;
   try {
-    return (await jwtVerify(value, new TextEncoder().encode(secret), { algorithms: ["HS256"] })).payload;
+    const { payload } = await jwtVerify(value, new TextEncoder().encode(secret), { algorithms: ["HS256"] });
+    if (payload.demo && process.env.DEMO_MODE !== "1") return null;
+    return payload;
   } catch {
     return null;
   }
