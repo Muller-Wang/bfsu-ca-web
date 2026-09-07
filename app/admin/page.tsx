@@ -250,7 +250,7 @@ function MemberForm({
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="modal-panel bg-card border rule rounded-sm max-w-lg w-full shadow-2xl"
+        className="modal-panel bg-white border rule rounded-sm max-w-lg w-full shadow-2xl"
       >
         <div className="px-7 py-6 border-b rule">
           <div className="meta mb-2">NEW MEMBER · 账号录入</div>
