@@ -1,26 +1,27 @@
 import type { Metadata } from "next";
-import { Newsreader, JetBrains_Mono, Geist } from "next/font/google";
+import localFont from "next/font/local";
 import { AppShell } from "@/components/shell/AppShell";
 import "./globals.css";
 
-const newsreader = Newsreader({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  style: ["normal", "italic"],
+const newsreader = localFont({
+  src: [
+    { path: "./fonts/newsreader-latin.woff2", weight: "400 700", style: "normal" },
+    { path: "./fonts/newsreader-latin-italic.woff2", weight: "400 700", style: "italic" },
+  ],
   variable: "--font-serif-display",
   display: "swap",
 });
 
-const geist = Geist({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
+const geist = localFont({
+  src: "./fonts/geist-latin.woff2",
+  weight: "400 600",
   variable: "--font-sans-body",
   display: "swap",
 });
 
-const mono = JetBrains_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500"],
+const mono = localFont({
+  src: "./fonts/jetbrains-mono-latin.woff2",
+  weight: "400 500",
   variable: "--font-mono-data",
   display: "swap",
 });
