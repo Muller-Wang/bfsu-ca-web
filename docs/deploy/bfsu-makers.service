@@ -9,6 +9,8 @@ User=bfsu
 Group=bfsu
 WorkingDirectory=/opt/bfsu-makers/app
 EnvironmentFile=/etc/bfsu-makers.env
+Environment=APP_ORIGIN=https://39.105.122.95
+Environment=NEXT_TELEMETRY_DISABLED=1
 ExecStart=/opt/bfsu-makers/runtime/node /opt/bfsu-makers/app/node_modules/next/dist/bin/next start -H 127.0.0.1 -p 3100
 Restart=on-failure
 RestartSec=5

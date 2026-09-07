@@ -4,7 +4,8 @@ const attempts = new Map<string, { count: number; resetAt: number }>();
 
 export function assertSameOrigin(request: Request) {
   const origin = request.headers.get("origin");
-  if (origin && origin !== new URL(request.url).origin) throw new Response("Forbidden", { status: 403 });
+  const expectedOrigin = process.env.APP_ORIGIN || new URL(request.url).origin;
+  if (origin && origin !== expectedOrigin) throw new Response("Forbidden", { status: 403 });
 }
 
 export function assertLoginRateLimit(request: Request) {
