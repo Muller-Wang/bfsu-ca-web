@@ -136,7 +136,7 @@ erDiagram
 - `work_no` 保留为展示用工号，唯一约束，`CA-<年>-<3位序号>` 由应用层生成（与现逻辑一致）
 - `password_hash`：bcrypt（cost 12），**任何情况下不下发到客户端**
 - `status`：`active / removed` 软删除——除名不删行，保留任务/学时历史的引用完整性
-- `probation_ends_at`：预备成员 = `join_date + 60 天`，替代 mock 里的静态 `probationLeftDays`，支持秘书处转正审批流
+- `probation_ends_at`：预备成员 = `join_date + 60 天`，替代 mock 里的静态 `probationLeftDays`，支持办公室转正审批流
 
 ### 6.2 展示用编号
 `tasks.code`（T-031）、`templates.code`（TP-01）、`ideas.code`（I-001）保留人类可读编号：

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import clsx from "clsx";
 import { useCurrentUser } from "@/lib/auth";
 import { runAction, useClubData, type CreditSummary } from "@/lib/club-data";
@@ -11,7 +12,7 @@ import { EmptyState, PageError, PageLoading, SectionError } from "@/components/u
 type Tab = "tasks" | "events" | "credits" | "files";
 
 export default function ProfilePage() {
-  const { user } = useCurrentUser();
+  const { user, setUser } = useCurrentUser();
   const { data, loading, error, refresh } = useClubData();
   const [tab, setTab] = useState<Tab>("tasks");
   const [showPassword, setShowPassword] = useState(false);
@@ -26,9 +27,10 @@ export default function ProfilePage() {
     <div className="page-shell max-w-5xl">
       {/* Identity card */}
       <section className="rise rise-1 grid grid-cols-[auto_1fr] sm:grid-cols-[auto_1fr_auto] gap-4 sm:gap-8 items-start mb-8 sm:mb-10">
-        <div className="w-16 h-16 sm:w-24 sm:h-24 border rule grid place-items-center font-serif text-3xl sm:text-4xl text-accent bg-card">
-          {user.name.slice(-1)}
-        </div>
+        <AvatarEditor
+          user={user}
+          onUploaded={(avatarUrl) => setUser({ ...user, avatarUrl })}
+        />
         <div>
           <div className="meta">PROFILE · 个人中心</div>
           <h1 className="display text-2xl sm:text-4xl mt-1">
@@ -126,6 +128,77 @@ export default function ProfilePage() {
         {tab === "credits" && <MyCredits summary={data.credits.find((item) => item.user.id === user.id)} />}
         {tab === "files" && <MyFiles templates={data.templates} />}
       </div>
+    </div>
+  );
+}
+
+function AvatarEditor({ user, onUploaded }: { user: NonNullable<ReturnType<typeof useCurrentUser>["user"]>; onUploaded: (url: string) => void }) {
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState("");
+
+  const upload = async (file?: File) => {
+    if (!file) return;
+    setMessage("");
+    if (file.size > 200 * 1024 * 1024) {
+      setMessage("头像不能超过 200 MB");
+      return;
+    }
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+      setMessage("请选择 JPG、PNG 或 WebP 图片");
+      return;
+    }
+
+    try {
+      setBusy(true);
+      const bitmap = await createImageBitmap(file);
+      const side = Math.min(bitmap.width, bitmap.height);
+      const sx = (bitmap.width - side) / 2;
+      const sy = (bitmap.height - side) / 2;
+      const cropped = await createImageBitmap(bitmap, sx, sy, side, side);
+      bitmap.close();
+
+      const canvas = new OffscreenCanvas(side, side);
+      const ctx = canvas.getContext("2d");
+      if (!ctx) throw new Error("画布初始化失败");
+      ctx.drawImage(cropped, 0, 0);
+      cropped.close();
+
+      const blob = await canvas.convertToBlob({ type: "image/png" });
+      const response = await fetch("/api/avatar", {
+        method: "POST",
+        headers: { "Content-Type": "image/png" },
+        body: blob,
+      });
+      const result = await response.json().catch(() => ({})) as { avatarUrl?: string; error?: string };
+      if (!response.ok || !result.avatarUrl) throw new Error(result.error || "上传失败");
+      onUploaded(result.avatarUrl);
+      setMessage("头像已更新");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "头像上传失败");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="w-24 sm:w-28">
+      <div className="relative w-16 h-16 sm:w-24 sm:h-24 overflow-hidden border rule grid place-items-center font-serif text-3xl sm:text-4xl text-accent bg-card">
+        {user.avatarUrl ? (
+          <Image src={user.avatarUrl} alt={`${user.name}的头像`} fill sizes="96px" className="object-cover" unoptimized />
+        ) : user.name.slice(-1)}
+      </div>
+      <label className="mt-2 inline-flex cursor-pointer border-b rule text-xs hover:border-accent hover:text-accent">
+        {busy ? "上传中…" : user.avatarUrl ? "更换头像" : "上传头像"}
+        <input
+          className="sr-only"
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          disabled={busy}
+          onChange={(event) => void upload(event.currentTarget.files?.[0])}
+        />
+      </label>
+      <p className="mt-1 text-[10px] leading-4 text-ink-soft">非正方形图片会自动居中裁切，200 MB 内</p>
+      {message && <p className="mt-1 text-[10px] leading-4 text-ink-soft" role="status">{message}</p>}
     </div>
   );
 }

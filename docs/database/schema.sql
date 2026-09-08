@@ -14,7 +14,7 @@ BEGIN;
 CREATE TYPE role_enum AS ENUM (
   'president',        -- 社长
   'vice_president',   -- 副社长
-  'secretary',        -- 秘书处
+  'secretary',        -- 办公室
   'head',             -- 部长
   'member',           -- 正式成员
   'probation'         -- 预备成员
@@ -55,7 +55,7 @@ CREATE TYPE idea_category_enum AS ENUM ('activity', 'outreach', 'content', 'inte
 
 -- 部门（小表，name 直接作主键，与现有代码中的中文字符串一致）
 CREATE TABLE departments (
-  name        TEXT PRIMARY KEY,            -- 四个部门 + 社长办（管理归属，非职能部门）
+  name        TEXT PRIMARY KEY,            -- 三个职能部门
   sort_order  SMALLINT NOT NULL DEFAULT 0,
   created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 );
@@ -73,6 +73,7 @@ CREATE TABLE users (
   join_date         DATE NOT NULL DEFAULT CURRENT_DATE,
   status            user_status_enum NOT NULL DEFAULT 'active',
   probation_ends_at DATE,                                   -- 预备成员 = join_date + 60 天
+  avatar_key        TEXT,                                   -- 头像文件在 UPLOAD_DIR 下的相对路径
   created_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
 
@@ -260,7 +261,7 @@ CREATE TABLE credit_records (
   hours       NUMERIC(4,1) NOT NULL,
   semester    TEXT NOT NULL,                   -- 2026-spring / 2026-autumn
   reason      TEXT NOT NULL DEFAULT '',        -- 录入说明
-  recorded_by TEXT REFERENCES users(id) ON DELETE SET NULL,     -- 录入人（秘书处）
+  recorded_by TEXT REFERENCES users(id) ON DELETE SET NULL,     -- 录入人（办公室）
   created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
 
   CONSTRAINT credit_hours_positive CHECK (hours >= 0),

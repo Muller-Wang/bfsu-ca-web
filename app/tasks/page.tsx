@@ -238,7 +238,7 @@ function ListView({ tasks, users }: { tasks: Task[]; users: User[] }) {
 }
 
 function TaskForm({ users, onCancel, onSaved }: { users: User[]; onCancel: () => void; onSaved: () => void }) {
-  const [form, setForm] = useState({ title: "", department: users[0]?.department || "秘书处", ddl: new Date().toISOString().slice(0, 10), assignee: users[0]?.id || "", cadence: "once" as TaskCadence });
+  const [form, setForm] = useState({ title: "", department: users[0]?.department || "办公室", ddl: new Date().toISOString().slice(0, 10), assignee: users[0]?.id || "", cadence: "once" as TaskCadence });
   const [error, setError] = useState("");
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();

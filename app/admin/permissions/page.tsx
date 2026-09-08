@@ -17,7 +17,7 @@ const PERMISSIONS = [
 const ROLES: { key: keyof typeof PERMISSIONS[0]["roles"]; label: string }[] = [
   { key: "president", label: "社长" },
   { key: "vice_president", label: "副社长" },
-  { key: "secretary", label: "秘书处" },
+  { key: "secretary", label: "办公室" },
   { key: "head", label: "部长" },
   { key: "member", label: "正式" },
   { key: "probation", label: "预备" },

@@ -3,20 +3,14 @@ export type Role = "president" | "vice_president" | "secretary" | "head" | "memb
 export const ROLE_LABEL: Record<Role, string> = {
   president: "社长",
   vice_president: "副社长",
-  secretary: "秘书处",
+  secretary: "办公室",
   head: "部长",
   member: "正式成员",
   probation: "预备成员",
 };
 
-export type Department =
-  | "社长办"
-  | "秘书处"
-  | "外联部"
-  | "学术部"
-  | "宣传部"
-  | "日语部"
-  | "德语部";
+export const DEPARTMENTS = ["项目部", "宣传部", "办公室"] as const;
+export type Department = (typeof DEPARTMENTS)[number];
 
 export interface User {
   id: string;         // 学号 e.g. 23110301021
@@ -28,6 +22,7 @@ export interface User {
   title?: string;     // 副社长 / 部长 / 干事
   joinDate: string;   // YYYY-MM-DD
   probationLeftDays?: number;
+  avatarUrl?: string;
 }
 
 export type EventTag = "school" | "internal" | "self" | "ddl";

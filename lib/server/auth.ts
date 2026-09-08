@@ -2,7 +2,7 @@ import "server-only";
 import { cookies } from "next/headers";
 import { SignJWT, jwtVerify, type JWTPayload } from "jose";
 import type { Role, User } from "@/lib/types";
-import { USERS } from "@/lib/mock/users";
+import { demoStore } from "@/lib/server/demo-store";
 import { db } from "./db";
 import { isDemoEnabled, sessionSecret } from "./env";
 
@@ -30,6 +30,7 @@ function rowToUser(row: Record<string, unknown>): User {
     title: row.title ? String(row.title) : undefined,
     joinDate: String(row.join_date).slice(0, 10),
     probationLeftDays: left,
+    avatarUrl: row.avatar_key ? `/api/avatar/${row.id}` : undefined,
   };
 }
 
@@ -74,12 +75,12 @@ export async function currentUser(): Promise<User | null> {
 
   if (session.demo) {
     if (!isDemoEnabled()) return null;
-    return USERS.find((user) => user.id === session.sub) ?? null;
+    return demoStore.users.find((user) => user.id === session.sub) ?? null;
   }
 
   const sql = db();
   const rows = await sql`
-    SELECT id, work_no, name, name_en, department, role, title, join_date, probation_ends_at
+    SELECT id, work_no, name, name_en, department, role, title, join_date, probation_ends_at, avatar_key
     FROM users
     WHERE id = ${session.sub} AND status = 'active'
     LIMIT 1

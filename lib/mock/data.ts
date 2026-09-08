@@ -43,7 +43,7 @@ export const EVENTS: CalendarEvent[] = [
     start: "19:00",
     end: "21:00",
     location: "英文学院 #205",
-    department: "外联部",
+    department: "项目部",
     owner: "24110301012",
     attachments: [
       { name: "策划书", ext: "docx" },
@@ -59,7 +59,7 @@ export const EVENTS: CalendarEvent[] = [
   },
   {
     id: "E-020",
-    title: "外联部周会",
+    title: "项目部周会",
     tag: "internal",
     date: "2026-05-16",
     start: "20:00",
@@ -76,7 +76,7 @@ export const EVENTS: CalendarEvent[] = [
     title: "读书会 5 月场",
     tag: "self",
     date: "2026-05-09",
-    department: "学术部",
+    department: "项目部",
   },
   {
     id: "E-017",
@@ -92,7 +92,7 @@ export const EVENTS: CalendarEvent[] = [
     start: "14:00",
     end: "16:00",
     location: "行政楼 #408",
-    department: "德语部",
+    department: "项目部",
     owner: "24110301056",
     attachments: [{ name: "策划书", ext: "docx" }],
   },
@@ -108,7 +108,7 @@ export const TASKS: Task[] = [
   {
     id: "T-031",
     title: "暑期方案撰写",
-    department: "外联部",
+    department: "项目部",
     status: "todo",
     ddl: "2026-05-30",
     assignee: "24110301012",
@@ -126,7 +126,7 @@ export const TASKS: Task[] = [
   {
     id: "T-029",
     title: "暑期方案撰写",
-    department: "学术部",
+    department: "项目部",
     status: "todo",
     ddl: "2026-05-30",
     assignee: "25110301003",
@@ -135,7 +135,7 @@ export const TASKS: Task[] = [
   {
     id: "T-024",
     title: "撰写英语角活动总结",
-    department: "外联部",
+    department: "项目部",
     status: "doing",
     ddl: "2026-05-21",
     assignee: "23110301007",
@@ -145,7 +145,7 @@ export const TASKS: Task[] = [
   {
     id: "T-025",
     title: "整理 4 月活动归档",
-    department: "秘书处",
+    department: "办公室",
     status: "doing",
     ddl: "2026-05-24",
     assignee: "23110301007",
@@ -155,7 +155,7 @@ export const TASKS: Task[] = [
   {
     id: "T-026",
     title: "下学期课程方案初稿",
-    department: "学术部",
+    department: "项目部",
     status: "doing",
     ddl: "2026-05-30",
     assignee: "23110301007",
@@ -165,7 +165,7 @@ export const TASKS: Task[] = [
   {
     id: "T-027",
     title: "德语沙龙物资清单",
-    department: "德语部",
+    department: "项目部",
     status: "doing",
     ddl: "2026-05-25",
     assignee: "24110301056",
@@ -194,7 +194,7 @@ export const TASKS: Task[] = [
   {
     id: "T-023",
     title: "学时核对",
-    department: "秘书处",
+    department: "办公室",
     status: "review",
     ddl: "2026-05-20",
     assignee: "25110301018",
@@ -203,7 +203,7 @@ export const TASKS: Task[] = [
   {
     id: "T-018",
     title: "5/12 例会记录",
-    department: "秘书处",
+    department: "办公室",
     status: "done",
     ddl: "2026-05-13",
     assignee: "25110301018",
@@ -212,7 +212,7 @@ export const TASKS: Task[] = [
   {
     id: "T-017",
     title: "4 月学时归档",
-    department: "秘书处",
+    department: "办公室",
     status: "done",
     ddl: "2026-05-10",
     assignee: "23110301007",
@@ -230,8 +230,8 @@ export const TASKS: Task[] = [
   },
   {
     id: "T-033",
-    title: "部门例会 · 外联部",
-    department: "外联部",
+    title: "部门例会 · 项目部",
+    department: "项目部",
     status: "doing",
     ddl: "2026-05-23",
     assignee: "24110301012",
@@ -250,8 +250,8 @@ export const TASKS: Task[] = [
   },
   {
     id: "T-035",
-    title: "部门例会 · 学术部",
-    department: "学术部",
+    title: "部门例会 · 项目部",
+    department: "项目部",
     status: "doing",
     ddl: "2026-05-23",
     assignee: "25110301003",
@@ -260,8 +260,8 @@ export const TASKS: Task[] = [
   },
   {
     id: "T-036",
-    title: "部门例会 · 德语部",
-    department: "德语部",
+    title: "部门例会 · 项目部",
+    department: "项目部",
     status: "todo",
     ddl: "2026-05-23",
     assignee: "24110301056",
@@ -269,8 +269,8 @@ export const TASKS: Task[] = [
   },
   {
     id: "T-037",
-    title: "秘书处周报汇总",
-    department: "秘书处",
+    title: "办公室周报汇总",
+    department: "办公室",
     status: "doing",
     ddl: "2026-05-26",
     assignee: "23110301007",
@@ -280,7 +280,7 @@ export const TASKS: Task[] = [
   {
     id: "T-038",
     title: "德语角双周策划",
-    department: "德语部",
+    department: "项目部",
     status: "todo",
     ddl: "2026-05-31",
     assignee: "24110301056",
@@ -289,7 +289,7 @@ export const TASKS: Task[] = [
   {
     id: "T-039",
     title: "学时月度统计",
-    department: "秘书处",
+    department: "办公室",
     status: "todo",
     ddl: "2026-06-01",
     assignee: "23110301007",
@@ -317,7 +317,7 @@ export const ARCHIVE: ArchiveItem[] = [
     id: "A-052",
     date: "2026-05-15",
     title: "关西俳句赏读会",
-    department: "日语部",
+    department: "项目部",
     tag: "self",
     files: [
       { kind: "策划书" },
@@ -330,7 +330,7 @@ export const ARCHIVE: ArchiveItem[] = [
     id: "A-051",
     date: "2026-05-08",
     title: "英语角 vol.11",
-    department: "外联部",
+    department: "项目部",
     tag: "self",
     files: [
       { kind: "策划书" },
@@ -342,8 +342,8 @@ export const ARCHIVE: ArchiveItem[] = [
   {
     id: "A-050",
     date: "2026-05-02",
-    title: "学术部读书会 vol.04",
-    department: "学术部",
+    title: "项目部读书会 vol.04",
+    department: "项目部",
     tag: "self",
     files: [
       { kind: "策划书" },
@@ -355,7 +355,7 @@ export const ARCHIVE: ArchiveItem[] = [
     id: "A-049",
     date: "2026-04-28",
     title: "迎新晚会",
-    department: "社长办",
+    department: "办公室",
     tag: "school",
     files: [
       { kind: "策划书" },
@@ -369,7 +369,7 @@ export const ARCHIVE: ArchiveItem[] = [
     id: "A-048",
     date: "2026-04-15",
     title: "德语角 4 月",
-    department: "德语部",
+    department: "项目部",
     tag: "self",
     files: [
       { kind: "策划书" },
@@ -379,12 +379,12 @@ export const ARCHIVE: ArchiveItem[] = [
 ];
 
 export const FEED: FeedItem[] = [
-  { id: "F-01", at: "2026-05-19", who: "日语部", what: "完成「关西俳句」活动归档（12 张照片 / 3 份文档）" },
+  { id: "F-01", at: "2026-05-19", who: "项目部", what: "完成「关西俳句」活动归档（12 张照片 / 3 份文档）" },
   { id: "F-02", at: "2026-05-18", who: "林雨", what: "上传 活动策划书模板 v3" },
-  { id: "F-03", at: "2026-05-17", who: "外联部", what: "提交英语角 vol.12 申请" },
-  { id: "F-04", at: "2026-05-16", who: "张明", what: "任命陈一然为「学术部部长」" },
+  { id: "F-03", at: "2026-05-17", who: "项目部", what: "提交英语角 vol.12 申请" },
+  { id: "F-04", at: "2026-05-16", who: "张明", what: "任命陈一然为「项目部部长」" },
   { id: "F-05", at: "2026-05-14", who: "宣传部", what: "完成 5/8 英语角推送排版" },
-  { id: "F-06", at: "2026-05-12", who: "秘书处", what: "发布 4 月学时统计" },
+  { id: "F-06", at: "2026-05-12", who: "办公室", what: "发布 4 月学时统计" },
 ];
 
 export const LIAISONS: LiaisonEntry[] = [
@@ -394,7 +394,7 @@ export const LIAISONS: LiaisonEntry[] = [
     category: "club",
     status: "cooperating",
     contact: "王思远",
-    contactRole: "外联部长",
+    contactRole: "项目部长",
     notes: "联合举办「中日韩青年论坛」，已确认场地和议程",
     updatedAt: "2026-05-22",
     nextStep: "6/1 前签署合作确认函",
@@ -476,7 +476,7 @@ export const LIAISONS: LiaisonEntry[] = [
     status: "negotiating",
     contact: "田中惠子",
     contactRole: "北京事务所文化担当",
-    notes: "申请「日本語教育支援プログラム」资助，用于日语部活动",
+    notes: "申请「日本語教育支援プログラム」资助，用于项目部活动",
     updatedAt: "2026-05-12",
     nextStep: "6 月底前补交预算明细",
     since: "2026-02",
@@ -551,7 +551,7 @@ export const IDEAS: Idea[] = [
   {
     id: "I-004",
     title: "例会形式改革：从听报告变成工作坊",
-    body: "现在例会基本都是部长汇报、社长总结，大家刷手机。可以尝试每月一次「工作坊例会」：抽一个部门现场做 20 分钟 mini 展示（如日语部教大家做一个简单的日本手账页、德语部带大家认德国啤酒种类），既练了该部门成员的输出能力，也让其他人有参与感。",
+    body: "现在例会基本都是部长汇报、社长总结，大家刷手机。可以尝试每月一次「工作坊例会」：抽一个部门现场做 20 分钟 mini 展示（如项目部教大家做一个简单的日本手账页、项目部带大家认德国啤酒种类），既练了该部门成员的输出能力，也让其他人有参与感。",
     authorId: "23110301007",
     authorName: "墨乐",
     anonymous: false,
@@ -573,7 +573,7 @@ export const IDEAS: Idea[] = [
   {
     id: "I-006",
     title: "活动报名系统接入微信小程序",
-    body: "现在活动报名靠群里接龙，经常漏人、重复、不好统计。可以做一个简单的微信小程序（或用现有工具如「群报数」），统一活动报名入口，自动生成参与名单，方便秘书处录入学时。",
+    body: "现在活动报名靠群里接龙，经常漏人、重复、不好统计。可以做一个简单的微信小程序（或用现有工具如「群报数」），统一活动报名入口，自动生成参与名单，方便办公室录入学时。",
     anonymous: true,
     category: "internal",
     createdAt: "2026-05-08",
@@ -602,12 +602,12 @@ export const IDEAS: Idea[] = [
 ];
 
 export const IDEA_COMMENTS: IdeaComment[] = [
-  { id: "C-001", ideaId: "I-004", body: "支持！能不能先从秘书处轮值开始试点？", authorName: "林思齐", anonymous: false, createdAt: "2026-05-16" },
+  { id: "C-001", ideaId: "I-004", body: "支持！能不能先从办公室轮值开始试点？", authorName: "林思齐", anonymous: false, createdAt: "2026-05-16" },
   { id: "C-002", ideaId: "I-004", body: "好主意，但部长们会不会觉得有压力？", anonymous: true, createdAt: "2026-05-17" },
-  { id: "C-003", ideaId: "I-004", body: "可以先从日语部和德语部试点，他们平时就经常做文化展示", authorName: "墨乐", anonymous: false, createdAt: "2026-05-17" },
+  { id: "C-003", ideaId: "I-004", body: "可以先从项目部和项目部试点，他们平时就经常做文化展示", authorName: "墨乐", anonymous: false, createdAt: "2026-05-17" },
   { id: "C-004", ideaId: "I-006", body: "群报数免费版有 50 人限制，建议直接用腾讯文档表单，免费不限量", anonymous: true, createdAt: "2026-05-09" },
   { id: "C-005", ideaId: "I-006", body: "同意，工具是次要的，关键是统一入口和自动统计", authorName: "张明", anonymous: false, createdAt: "2026-05-10" },
-  { id: "C-006", ideaId: "I-001", body: "外联部可以帮忙采购一些小物料做盲盒内容", authorName: "林雨", anonymous: false, createdAt: "2026-05-21" },
+  { id: "C-006", ideaId: "I-001", body: "项目部可以帮忙采购一些小物料做盲盒内容", authorName: "林雨", anonymous: false, createdAt: "2026-05-21" },
   { id: "C-007", ideaId: "I-001", body: "盲盒包装成本会不会很高？建议用牛皮纸袋手绘，反而更有味道", anonymous: true, createdAt: "2026-05-21" },
   { id: "C-008", ideaId: "I-003", body: "这个太需要了，上个月第一次联系企业发邮件改了 5 版", anonymous: true, createdAt: "2026-05-17" },
   { id: "C-009", ideaId: "I-005", body: "我有几个在德国和美国的朋友可以做第一期的嘉宾", authorName: "墨乐", anonymous: false, createdAt: "2026-05-13" },

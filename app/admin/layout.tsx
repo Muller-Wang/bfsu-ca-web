@@ -21,7 +21,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const { user, ready } = useCurrentUser();
   const allowed = canSeeAdmin(user);
 
-  // 权限守卫：仅社长/副社长/秘书处可访问，其余角色直接访问 URL 会被拦回主页
+  // 权限守卫：仅社长/副社长/办公室可访问，其余角色直接访问 URL 会被拦回主页
   useEffect(() => {
     if (ready && !allowed) {
       router.replace("/dashboard");
@@ -41,7 +41,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <div className="rise rise-1 mb-2">
         <div className="meta">ADMIN · 管理后台</div>
         <h1 className="display text-4xl mt-2">管理后台</h1>
-        <p className="meta mt-2">仅社长 · 副社长 · 秘书处可访问</p>
+        <p className="meta mt-2">仅社长 · 副社长 · 办公室可访问</p>
       </div>
 
       <hr className="border-t rule my-8" />

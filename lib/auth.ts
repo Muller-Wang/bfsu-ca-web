@@ -27,12 +27,12 @@ export function canSeeAdmin(user: User | null) {
   return !!user && ["president", "vice_president", "secretary"].includes(user.role);
 }
 
-/** 除名成员：仅社长（president）可执行。副社长与秘书处不可。 */
+/** 除名成员：仅社长（president）可执行。副社长与办公室不可。 */
 export function canRemoveMember(user: User | null) {
   return user?.role === "president";
 }
 
-/** 删除活动：社长 / 副社长 / 秘书处均可 */
+/** 删除活动：社长 / 副社长 / 办公室均可 */
 export function canDeleteEvent(user: User | null) {
   return canSeeAdmin(user);
 }

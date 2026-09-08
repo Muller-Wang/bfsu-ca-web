@@ -19,6 +19,7 @@ const cleanUser = (row: Record<string, unknown>): User => ({
   probationLeftDays: row.probation_ends_at
     ? Math.max(0, Math.ceil((new Date(String(row.probation_ends_at)).getTime() - Date.now()) / 86_400_000))
     : undefined,
+  avatarUrl: row.avatar_key ? `/api/avatar/${row.id}` : undefined,
 });
 
 export async function GET() {
@@ -42,7 +43,7 @@ export async function GET() {
 
     const sql = db();
     const [users, events, tasks, announcements, templates, archives, archiveFiles, liaisons, feed, ideas, comments, credits] = await Promise.all([
-      sql`SELECT id, work_no, name, name_en, department, role, title, join_date, probation_ends_at FROM users WHERE status = 'active' ORDER BY work_no`,
+      sql`SELECT id, work_no, name, name_en, department, role, title, join_date, probation_ends_at, avatar_key FROM users WHERE status = 'active' ORDER BY work_no`,
       sql`SELECT e.*, u.name AS owner_name FROM events e LEFT JOIN users u ON u.id = e.owner_id ORDER BY e.event_date, e.start_time NULLS LAST`,
       sql`SELECT * FROM tasks ORDER BY due_date, code`,
       sql`SELECT a.*, COALESCE(u.name, '系统') AS author_name FROM announcements a LEFT JOIN users u ON u.id = a.author_id ORDER BY a.pinned DESC, a.published_at DESC`,
@@ -54,8 +55,8 @@ export async function GET() {
       sql`SELECT i.*, u.name AS author_name FROM ideas i LEFT JOIN users u ON u.id = i.author_id ORDER BY i.created_at DESC`,
       sql`SELECT c.*, u.name AS author_name FROM idea_comments c LEFT JOIN users u ON u.id = c.author_id ORDER BY c.created_at`,
       isAdminRole(user.role)
-        ? sql`SELECT v.*, u.work_no, u.name_en, u.role, u.title, u.join_date FROM v_credit_totals v JOIN users u ON u.id = v.user_id ORDER BY u.work_no`
-        : sql`SELECT v.*, u.work_no, u.name_en, u.role, u.title, u.join_date FROM v_credit_totals v JOIN users u ON u.id = v.user_id WHERE v.user_id = ${user.id}`,
+        ? sql`SELECT v.*, u.work_no, u.name_en, u.role, u.title, u.join_date, u.avatar_key FROM v_credit_totals v JOIN users u ON u.id = v.user_id ORDER BY u.work_no`
+        : sql`SELECT v.*, u.work_no, u.name_en, u.role, u.title, u.join_date, u.avatar_key FROM v_credit_totals v JOIN users u ON u.id = v.user_id WHERE v.user_id = ${user.id}`,
     ]);
 
     const data: ClubData = {

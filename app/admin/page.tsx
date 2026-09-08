@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import clsx from "clsx";
-import { ROLE_LABEL, type Department, type Role, type User } from "@/lib/types";
+import { DEPARTMENTS, ROLE_LABEL, type Department, type Role, type User } from "@/lib/types";
 import { canRemoveMember, useCurrentUser } from "@/lib/auth";
 import { runAction, useClubData } from "@/lib/club-data";
 import { EmptyState, SectionError, SectionLoading } from "@/components/ui/PageState";
@@ -64,7 +64,7 @@ export default function AdminMembersPage() {
           <option value="all">状态 · 全部</option>
           <option value="president">社长</option>
           <option value="vice_president">副社长</option>
-          <option value="secretary">秘书处</option>
+          <option value="secretary">办公室</option>
           <option value="head">部长</option>
           <option value="member">正式成员</option>
           <option value="probation">预备成员</option>
@@ -144,7 +144,7 @@ export default function AdminMembersPage() {
       {!allowRemove && (
         <div className="mt-6 px-4 py-3 border-l-2 border-rule bg-card/50 text-sm text-ink-soft">
           <span className="meta mr-2">ⓘ 权限说明</span>
-          「除名」仅社长可执行。副社长 / 秘书处可执行其他成员管理操作。
+          「除名」仅社长可执行。副社长 / 办公室可执行其他成员管理操作。
         </div>
       )}
 
@@ -152,7 +152,7 @@ export default function AdminMembersPage() {
       {filtered.some((u) => u.probationLeftDays) && (
         <div className="mt-3 px-4 py-3 border-l-2 border-warn bg-card/50 text-sm">
           <span className="meta text-warn mr-2">⓵ 提醒</span>
-          预备期成员将在 60 天后自动提示秘书处审批转正
+          预备期成员将在 60 天后自动提示办公室审批转正
         </div>
       )}
 
@@ -213,8 +213,6 @@ export default function AdminMembersPage() {
 
 /* ── 添加成员表单 ── */
 
-const DEPARTMENTS: Department[] = ["社长办", "秘书处", "外联部", "学术部", "宣传部"];
-
 const ROLE_OPTIONS: Role[] = ["member", "probation", "head", "secretary", "vice_president", "president"];
 
 function MemberForm({
@@ -228,7 +226,7 @@ function MemberForm({
     id: "",
     name: "",
     nameEn: "",
-    department: "秘书处" as Department,
+    department: "办公室" as Department,
     role: "probation" as Role,
     title: "",
     password: "",

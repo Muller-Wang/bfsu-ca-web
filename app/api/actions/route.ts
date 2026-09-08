@@ -4,12 +4,12 @@ import { z } from "zod";
 import { currentSessionIsDemo, requireRole, requireUser } from "@/lib/server/auth";
 import { db } from "@/lib/server/db";
 import { demoStore, nextCode } from "@/lib/server/demo-store";
-import type { Announcement, CalendarEvent, Idea, IdeaComment, Task, Template, User } from "@/lib/types";
+import { DEPARTMENTS, type Announcement, type CalendarEvent, type Idea, type IdeaComment, type Task, type Template, type User } from "@/lib/types";
 import { assertSameOrigin } from "@/lib/server/request";
 
 const Envelope = z.object({ action: z.string(), payload: z.record(z.string(), z.unknown()).default({}) });
 const Role = z.enum(["president", "vice_president", "secretary", "head", "member", "probation"]);
-const Department = z.enum(["社长办", "秘书处", "外联部", "学术部", "宣传部"]);
+const Department = z.enum(DEPARTMENTS);
 const AdminRoles = ["president", "vice_president", "secretary"] as const;
 
 function badRequest(error: unknown) {

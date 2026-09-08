@@ -117,7 +117,7 @@ danger     #8c2a1f   砖红
 | Role | 中文 | 看 Admin？ |
 |------|------|-----------|
 | `president` | 社长 | ✓ |
-| `secretary` | 秘书处 | ✓ |
+| `secretary` | 办公室 | ✓ |
 | `head` | 部长 | ✗ |
 | `member` | 正式成员 | ✗ |
 | `probation` | 预备成员 | ✗ |
@@ -127,7 +127,7 @@ danger     #8c2a1f   砖红
 接 Postgres 后：
 - 密码用 bcrypt 哈希（cost ≥ 12）
 - session 走 httpOnly cookie，不放 token 在 localStorage
-- 预备期默认 60 天，到期由秘书处**手动**审批转正
+- 预备期默认 60 天，到期由办公室**手动**审批转正
 
 ---
 

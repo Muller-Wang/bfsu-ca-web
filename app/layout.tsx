@@ -29,20 +29,20 @@ const mono = localFont({
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.APP_ORIGIN || "https://39.105.122.95"),
   title: "北外创客俱乐部 · BFSU Makers Club",
-  description: "北京外国语大学创客俱乐部内部管理系统",
+  description: "创意，在北外。",
   icons: { icon: "/club-logo.png", apple: "/club-logo.png" },
   openGraph: {
-    title: "北外创客俱乐部",
+    title: "北外创客俱乐部 · BFSU Makers Club",
     description: "创意，在北外。",
     type: "website",
     locale: "zh_CN",
-    images: [{ url: "/club-logo.png", width: 500, height: 500, type: "image/png", alt: "北外创客俱乐部 LOGO" }],
+    images: [{ url: "/share-logo.jpg", width: 200, height: 200, type: "image/jpeg", alt: "北外创客俱乐部 LOGO" }],
   },
   twitter: {
     card: "summary",
-    title: "北外创客俱乐部",
+    title: "北外创客俱乐部 · BFSU Makers Club",
     description: "创意，在北外。",
-    images: ["/club-logo.png"],
+    images: ["/share-logo.jpg"],
   },
 };
 

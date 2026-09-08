@@ -123,7 +123,7 @@ export default function AdminEventsPage() {
 }
 
 function EventForm({ users, onCancel, onSaved }: { users: User[]; onCancel: () => void; onSaved: () => void }) {
-  const [form, setForm] = useState({ title: "", tag: "self" as EventTag, date: new Date().toISOString().slice(0, 10), start: "", end: "", location: "", department: "学术部" as Department, owner: users[0]?.id || "", description: "" });
+  const [form, setForm] = useState({ title: "", tag: "self" as EventTag, date: new Date().toISOString().slice(0, 10), start: "", end: "", location: "", department: "项目部" as Department, owner: users[0]?.id || "", description: "" });
   const [error, setError] = useState("");
   const submit = async (event: React.FormEvent) => { event.preventDefault(); try { await runAction("createEvent", form); onSaved(); } catch (cause) { setError(cause instanceof Error ? cause.message : "创建失败"); } };
   return (

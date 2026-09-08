@@ -29,7 +29,7 @@ export async function POST(request: Request) {
   try {
   const sql = db();
   const rows = await sql`
-    SELECT id, work_no, name, name_en, department, role, title, join_date, password_hash
+    SELECT id, work_no, name, name_en, department, role, title, join_date, password_hash, avatar_key
     FROM users WHERE id = ${parsed.data.id} AND status = 'active' LIMIT 1
   `;
   const row = rows[0];
@@ -42,6 +42,7 @@ export async function POST(request: Request) {
     nameEn: row.name_en ? String(row.name_en) : undefined,
     department: row.department as User["department"], role: row.role as User["role"],
     title: row.title ? String(row.title) : undefined, joinDate: String(row.join_date).slice(0, 10),
+    avatarUrl: row.avatar_key ? `/api/avatar/${row.id}` : undefined,
   };
   await issueSession(user);
   return NextResponse.json({ user });

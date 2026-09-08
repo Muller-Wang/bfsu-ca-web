@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { ClubBrand } from "@/components/brand/ClubBrand";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
@@ -116,7 +117,9 @@ export function TopBar() {
                     fontWeight: 600,
                   }}
                 >
-                  {user.name.slice(-1)}
+                  {user.avatarUrl ? (
+                    <Image src={user.avatarUrl} alt="" width={28} height={28} className="h-7 w-7 rounded-full object-cover" unoptimized />
+                  ) : user.name.slice(-1)}
                 </span>
                 <span className="hidden md:inline" style={{ fontSize: 14, color: "var(--ink)" }}>{user.name}</span>
                 <ChevronDown

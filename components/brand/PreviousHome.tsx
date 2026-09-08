@@ -7,7 +7,7 @@ import { ParticleCanvas } from "@/components/ui/ParticleCanvas";
 const STATS = [
   { num: "30+", label: "场跨语种活动 / 年" },
   { num: "5,000+", label: "覆盖全校人次" },
-  { num: "4", label: "职能部门" },
+  { num: "3", label: "职能部门" },
   { num: "2014", label: "成立年份" },
 ];
 
@@ -22,7 +22,7 @@ const BENTO_SMALL = [
   },
 ];
 
-const DEPTS = ["秘书处", "外联部", "学术部", "宣传部"];
+const DEPTS = ["项目部", "宣传部", "办公室"];
 
 /* Bento card shell */
 function Card({ dark = false, children, style }: { dark?: boolean; children: React.ReactNode; style?: React.CSSProperties }) {
@@ -263,7 +263,7 @@ export default function HomePage() {
             <div id="depts" className="col-span-6 sm:col-span-4">
               <Card dark style={{ minHeight: 230, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
                 <h3 style={{ fontSize: 24, fontWeight: 600, letterSpacing: "-0.02em", margin: 0, color: "var(--on-dark)" }}>
-                  四个部门，一种语言：创意。
+                  三个部门，一种语言：创意。
                 </h3>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginTop: 26 }}>
                   {DEPTS.map((d) => (
